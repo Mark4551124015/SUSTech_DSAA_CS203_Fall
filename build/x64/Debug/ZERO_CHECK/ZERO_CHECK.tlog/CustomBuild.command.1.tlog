@@ -1,0 +1,10 @@
+^C:\USERS\MARK455\DOCUMENTS\WORKSPACE\DSAA\BUILD\CMAKEFILES\D187A4D017273F6CDE65D54776F3D83A\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/Mark455/Documents/WORKSPACE/DSAA -BC:/Users/Mark455/Documents/WORKSPACE/DSAA/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/Mark455/Documents/WORKSPACE/DSAA/build/DSAA.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
