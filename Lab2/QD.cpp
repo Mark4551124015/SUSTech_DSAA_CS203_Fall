@@ -1,12 +1,14 @@
 #include <cstdio>
 #include <cmath>
-#define ll long long
+#define ll long
 #pragma G++ optimize(2)
-int n, m, discount, extra, P, //n, m, km temp Number, extra and discount value every round, length of numbers temp;
-input[(int)2e5][(int)9], length[(int)2e5], profit[(int)2e6], number[(int)2e5];  //store origin Array to sort             
+ll n, m, discount, extra, P, //
+input[(ll)2e5][(ll)9], length[(ll)2e5], number[(ll)2e5];  //store origin Array to sort      
+ll profit[(ll)2e6];
+ll tempArr2[(ll)2e6];
 ll A;
 //Fast RW
-inline int read() {
+inline ll read() {
     ll x = 0, f = 1;
     char c = getchar();
     while (c < '0' || c>'9') { if (c == '-') f = -1; c = getchar(); }
@@ -23,12 +25,12 @@ inline void Write(ll x)
 }
 
 //Merge Sort
-inline void merge(int arr[], int tempArr[], int left, int mid, int right) {
-    int j = left;       //index for left arr
-    int k = mid+1;      //index for right arr
-    int index = left;   //index for tempArr
+inline void merge(ll arr[], ll tempArr[], ll left, ll mid, ll right) {
+    ll j = left;       //index for left arr
+    ll k = mid+1;      //index for right arr
+    ll index = left;   //index for tempArr
     while (j <= mid && k <= right) {
-        if (arr[j] < arr[k]) {
+        if (arr[j] > arr[k]) {
             tempArr[index++] = arr[j++];
         } else {
             tempArr[index++] = arr[k++];
@@ -46,28 +48,27 @@ inline void merge(int arr[], int tempArr[], int left, int mid, int right) {
         left++;
     }
 }
-inline void mS(int arr[], int tempArr[], int left, int right ){
+inline void mS(ll arr[], ll tempArr[], ll left, ll right ){
     if (left < right) {
         //spit then merge
-        int mid = (left+right)/2;
+        ll mid = (left+right)/2;
         mS(arr, tempArr, left, mid);
         mS(arr, tempArr, mid+1, right);
         merge(arr, tempArr, left, mid ,right);
     }
 }
-inline void mergeSort(int arr[], int len) {
-    int tempArr[(int)2e6];
-    mS(arr, tempArr, 0, len-1);
+inline void mergeSort(ll arr[], ll len) {
+    mS(arr, tempArr2, 0, len-1);
 }
 
-inline void update(int index, int extraNum){
+inline void update(ll index, ll extraNum){
     number[index] += extraNum;
-    int len_cnt = 0;
-    int temp = number[index];
+    ll len_cnt = 0;
+    ll temp = number[index];
     if (temp<0) {
         temp*=-1;
     }
-    int thisNum;
+    ll thisNum;
     while (temp >= 1) {
         thisNum = temp%10;
         input[index][len_cnt++] = thisNum;
@@ -76,17 +77,17 @@ inline void update(int index, int extraNum){
     length[index] = len_cnt;
 }
 
-inline void proccessNum(int index) {
-    int len = length[index];
-    int num = number[index];
+inline void proccessNum(ll index) {
+    ll len = length[index];
+    ll num = number[index];
     extra = 0;
     bool positive = true;
     if (num < 0) {
         positive = !positive;
     }
-    for (int j = len -1; j >= 0; j--) {
-        int maxIndex = j;
-        for (int k = j; k >= 0; k--) {
+    for (ll j = len -1; j >= 0; j--) {
+        ll maxIndex = j;
+        for (ll k = j; k >= 0; k--) {
             if (input[index][k] > input[index][maxIndex] && positive) {
                 maxIndex = k;
             }
@@ -102,34 +103,25 @@ inline void proccessNum(int index) {
         if (extra > discount) {
             update(index, extra);
             profit[P++] = extra;
-        } else {
-            break;
-        }
+        } 
     }
 }
 
 int main(){
-    for (int times = 0; times < 500; times++) {
-        n = read();
-        m = read();
-        discount = read();
-        A=0;
-        P=0;
-        for (int i = 0; i < n; i++){
-            number[i] = read();
-            A+=number[i];
-            update(i, 0);
-        }
-
-        for (int i = 0; i < n; i++) {
-            proccessNum(i);
-        }
-        mergeSort(profit, P);
-        for (int i = 0; i < P && i <= m; i++) {
-            A += profit[i] - discount;
-        }
-        Write(A);
-        printf("\n");
+    n = read();
+    m = read();
+    discount = read();
+    A=0;
+    P=0;
+    for (ll i = 0; i < n; i++){
+        number[i] = read();
+        A+=number[i];
+        update(i, 0);
+        proccessNum(i);
     }
-
+    mergeSort(profit, P);
+    for (ll i = 0; i < P && i < m; i++) {
+        A += profit[i] - discount;
+    }
+    Write(A);
 }

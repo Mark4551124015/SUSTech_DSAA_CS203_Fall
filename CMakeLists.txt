@@ -3,4 +3,5 @@ project(DSAA)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(DSAA main.cpp Lab1/QA.cpp Lab1/QB.cpp)
+add_executable(DSAA main.cpp)
+
