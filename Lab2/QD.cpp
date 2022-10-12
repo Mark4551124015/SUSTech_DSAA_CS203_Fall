@@ -2,7 +2,7 @@
 #include <cmath>
 #define ll long
 #pragma G++ optimize(2)
-ll n, m, discount, extra, P, //
+ll n, m, discount, extra, P,
 input[(ll)2e5][(ll)9], length[(ll)2e5], number[(ll)2e5];  //store origin Array to sort      
 ll profit[(ll)2e6];
 ll tempArr2[(ll)2e6];
