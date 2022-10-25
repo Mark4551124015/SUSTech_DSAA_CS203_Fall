@@ -21,11 +21,11 @@ inline void Write(ll x)
     putchar(x%10+'0');
 }
 
-struct LinkNode {
+struct Node {
     ll data;
-    LinkNode* n;
-    LinkNode* p;
-    LinkNode (ll input, LinkNode* inputPre, LinkNode* inputNext) {
+    Node* n;
+    Node* p;
+    Node (ll input, Node* inputPre, Node* inputNext) {
         data = input;
         p = inputPre;
         n = inputNext;
@@ -43,16 +43,15 @@ int main() {
     tmp = read();
     storeCnt = n;
     totalPrice = tmp;
-    LinkNode* headA = new LinkNode (tmp, NULL, NULL);
-    LinkNode* index = headA; 
+    Node* headA = new Node (tmp, NULL, NULL);
+    Node* index = headA; 
     
     for (int i = 1; i < n; i++) {
         tmp = read();
-        LinkNode* newNode = new LinkNode (tmp, index, NULL);
+        Node* newNode = new Node (tmp, index, NULL);
         totalPrice += tmp;
         //setting p and n
         index->n = newNode;
-        newNode->p = index;
         //move on
         index = index->n;
     }

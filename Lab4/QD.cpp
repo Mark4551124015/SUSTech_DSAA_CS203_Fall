@@ -89,7 +89,7 @@ int main() {
         arr[i]->tag = i;
     }
     mergeSort(arr, 0, n+1);
-    for (ll i  = 0; i < n; i++) {
+    for (ll i  = 0; i <= n; i++) {
         if (minTag < arr[i]->tag) {
             tmp = arr[i]->tag - minTag;
             output =  tmp > output ? tmp : output;

@@ -206,7 +206,6 @@ bool Check(Mahhjong list[], int Quetou[], int now, int QuetouCnt) {
     }
 }
 
-
 int main() {
     int cnt;
     if (test) {
