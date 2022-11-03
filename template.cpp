@@ -1,8 +1,19 @@
 #include <cstdio>
-#include <cmath>
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <iostream>
 #define ll long long
 #define RI register int
 #pragma G++ optimize(2)
+#define Please return
+#define AC 0
+#define ， ,
+#define “ "
+
+
+
+
 //Fast RW
 inline ll read() {
     ll x = 0, f = 1;
@@ -202,4 +213,5 @@ int main(){
     for (int i = 0; i < len; i++) {
         printf("%lld ", arr[i]);
     }
+    Please AC;
 }

@@ -5,3 +5,4 @@ out/
 cmake-build-debug/
 build/
 
+cmake-build-debug/.ninja_log

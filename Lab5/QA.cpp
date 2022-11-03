@@ -5,6 +5,8 @@
 #include <algorithm>
 #pragma G++ optimize(2)
 #define ll int
+#define Please return
+#define AC 0
 using namespace std;
 ll T, n, solution[300], sollen;
 struct Node
@@ -117,6 +119,7 @@ int main() {
             putchar('\n');
         }
     }
+    Please AC;
 }
 
 /*

@@ -5,8 +5,10 @@
 #define maxArray 80100
 #define maxBlock 283
 #define ll int
+#define Please
+#define AC
 using namespace std;
-ll n, m, cntBlock = 0 , MaxNum = 0, idMap[maxArray];
+ll n, m, cntBlock = 0 , MaxNum = 0, range[maxData];
 // Fast I/O
 inline ll read() {
     ll x = 0, f = 1;
@@ -32,10 +34,10 @@ inline void Write(ll x)
 }
 
 struct Node{
-	ll left, right;
-	ll array[maxBlock*2+10],cntS[maxArray/maxBlock+5],cnt[maxArray],size;
+	ll prev, next;
+	ll array[maxBlock*2+10],cntS[maxData/maxBlock+5],cnt[maxData],size;
 	void InsertBlock();
-}B[maxArray/maxBlock],SB;
+}B[maxData/maxBlock],temp;
 
 inline void InsertBlock(ll index) {
 	cntBlock++;
@@ -74,7 +76,7 @@ inline void split(ll index) {
 	
 	// update arrays
 	for (ll i = 0; i < maxBlock; i++) {
-		B[index].cntS[idMap[B[cntBlock].array[i]]]--;
+		B[index].cntS[range[B[cntBlock].array[i]]]--;
 		B[index].cnt[B[cntBlock].array[i]]--;
 	}
 }
@@ -92,7 +94,7 @@ inline void Insert(ll pos, ll data) {
 	B[index].size++;
 	// array stuff
 	for (ll i = index; i; i = B[i].right) {
-		B[i].cntS[idMap[data]]++;
+		B[i].cntS[range[data]]++;
 		B[i].cnt[data]++;
 	}
 	if (B[index].size >= 2 * maxBlock) {
@@ -106,8 +108,8 @@ inline void Modify(ll pos, ll data) {
 	ll data_old = B[index].array[pos - 1];
 	B[index].array[pos - 1] = data;
 	while (index) {
-		B[index].cntS[idMap[data_old]]--;
-		B[index].cntS[idMap[data]]++;
+		B[index].cntS[range[data_old]]--;
+		B[index].cntS[range[data]]++;
 		B[index].cnt[data_old]--;
 		B[index].cnt[data]++;
 		index = B[index].right;
@@ -123,29 +125,29 @@ inline ll Query(ll l, ll r, ll k) {
 	if (leftBlock == rightBlock) {
 		for (ll i = l - 1, j = r - 1, tmp;i <= j; i++) {
 			tmp = B[leftBlock].array[i];
-			SB.cntS[idMap[tmp]]++;
-			SB.cnt[tmp]++;
+			temp.cntS[range[tmp]]++;
+			temp.cnt[tmp]++;
 		}
-		for (ll i = 1; i <= idMap[maxArray - 1]; i++) {
-			if (SB.cntS[i] >= k) {
+		for (ll i = 1; i <= range[maxData - 1]; i++) {
+			if (temp.cntS[i] >= k) {
 				for (ll j = (i - 1) * maxBlock;;j++) {
-					if (k <= SB.cnt[j]) {
+					if (k <= temp.cnt[j]) {
 						out = j;
 						break;
 					} else {
-						k -= SB.cnt[j];
+						k -= temp.cnt[j];
 					}
 				}
 				break;
 			} else {
-				k -= SB.cntS[i];
+				k -= temp.cntS[i];
 			}
 		}
 
 		for (ll i = l - 1, j = r - 1, tmp;i <= j; i++) {
 			tmp = B[leftBlock].array[i];
-			SB.cntS[idMap[tmp]]--;
-			SB.cnt[tmp]--;
+			temp.cntS[range[tmp]]--;
+			temp.cnt[tmp]--;
 		}
 
 		return out;
@@ -153,21 +155,21 @@ inline ll Query(ll l, ll r, ll k) {
 		//part in left bock
 		for (ll i = l - 1, tmp; i < B[leftBlock].size; i++) {
 			tmp = B[leftBlock].array[i];
-			SB.cntS[idMap[tmp]]++;
-			SB.cnt[tmp]++;
+			temp.cntS[range[tmp]]++;
+			temp.cnt[tmp]++;
 		}
 		//part in right block
 		for (ll i = 0, tmp; i < r; i++) {
 			tmp = B[rightBlock].array[i];
-			SB.cntS[idMap[tmp]]++;
-			SB.cnt[tmp]++;
+			temp.cntS[range[tmp]]++;
+			temp.cnt[tmp]++;
 		}
 		rightBlock = B[rightBlock].left;
-		for (ll i = 1, tmp; i <= idMap[MaxNum]; i++) {
-			tmp = B[rightBlock].cntS[i] - B[leftBlock].cntS[i] + SB.cntS[i];
+		for (ll i = 1, tmp; i <= range[MaxNum]; i++) {
+			tmp = B[rightBlock].cntS[i] - B[leftBlock].cntS[i] + temp.cntS[i];
 			if (tmp >= k) {
 				for (ll j = (i - 1) * maxBlock, res;;j++) {
-					res =  B[rightBlock].cnt[j] - B[leftBlock].cnt[j] + SB.cnt[j];
+					res =  B[rightBlock].cnt[j] - B[leftBlock].cnt[j] + temp.cnt[j];
 					if (k <= res) {
 						out = j;
 						break;
@@ -184,28 +186,28 @@ inline ll Query(ll l, ll r, ll k) {
 		rightBlock = B[rightBlock].right;
 		for (ll i = l - 1, tmp; i < B[leftBlock].size; i++) {
 			tmp = B[leftBlock].array[i];
-			SB.cntS[idMap[tmp]]--;
-			SB.cnt[tmp]--;
+			temp.cntS[range[tmp]]--;
+			temp.cnt[tmp]--;
 		}
 		for (ll i = 0, tmp; i < r; i++) {
 			tmp = B[rightBlock].array[i];
-			SB.cntS[idMap[tmp]]--;
-			SB.cnt[tmp]--;
+			temp.cntS[range[tmp]]--;
+			temp.cnt[tmp]--;
 		}
 		return out;
 	}
 }
 
 inline void init() {
-    for(ll i=0;i<maxArray;i++) {
-		idMap[i]=i/maxBlock+1;
+    for(ll i=0;i<maxData;i++) {
+		range[i]=i/maxBlock+1;
 	}
-	cntBlock=idMap[n-1];
+	cntBlock=range[n-1];
 	for(ll i=0;i<n;i++){
-		ll id = idMap[i], input;
+		ll id = range[i], input;
 		input = read();
 		B[id].array[B[id].size] = input;
-		B[id].cntS[idMap[input]]++;
+		B[id].cntS[range[input]]++;
 		B[id].cnt[input]++;
 		B[id].size++;
 		MaxNum = MaxNum >= input ? MaxNum : input;
@@ -215,8 +217,8 @@ inline void init() {
 		B[i-1].right=i, B[i].left=i-1;
 		for(ll j=0;j<=MaxNum;j++){
 			B[i].cnt[j] += B[i-1].cnt[j];
-			if(j==0 || idMap[j]!=idMap[j-1]) {
-				B[i].cntS[idMap[j]] += B[i-1].cntS[idMap[j]];
+			if(j==0 || range[j]!=range[j-1]) {
+				B[i].cntS[range[j]] += B[i-1].cntS[range[j]];
 			}
 		}
 	}
@@ -258,4 +260,5 @@ int main() {
 			printf("Wrong Operator: %c\n", op);
 		}
 	}
+	Please AC;
 }
