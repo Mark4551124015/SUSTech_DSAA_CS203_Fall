@@ -2,15 +2,14 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "c++",
-            "command": "/usr/bin/clang++",
+            "label": "C/C++: g++.exe 生成活动文件",
+            "command": "C:\\MinGW\\bin\\g++.exe",
             "args": [
-                "-fcolor-diagnostics",
-                "-fansi-escape-codes",
+                "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
                 "-o",
-                "${workspaceFolder}/out/${fileBasenameNoExtension}"
+                "${fileDirname}\\out\\${fileBasenameNoExtension}.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"

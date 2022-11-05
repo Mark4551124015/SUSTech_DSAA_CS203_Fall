@@ -1,81 +1,52 @@
-#include <cstdio>
-#include <cmath>
-#include <cstring>
-#include <string>
-#define maxData (int)1e5+1
-#define ll int
-#define size 26
-#define Please
-#define AC
+#include<bits/stdc++.h>
 using namespace std;
-ll x, len;
-ll arr[maxData][size];
-char str[maxData];
+typedef unsigned long long ull;
+const ull M=131;
+const ull N=1e6+10;
+ull H1[N],H2[N],p[N];
 
-inline int readStr(char str[]) {
-    char c;
-    c= getchar();
-    ll i = 0;
-	while (!isalpha(c)) {
-	    c = getchar();
-	}
-    while (isalpha(c)) {
-        str[i++] = c;
-        c = getchar();
-    }
-    return i;
-}
-
-inline void Write(ll x)
+ull f1(int l,int r)
 {
-    if(x<0)
-        putchar('-'),x=-x;
-    if(x>9)
-        Write(x/10);
-    putchar(x%10+'0');
+    return H1[r]-H1[l-1]*p[r-l+1];
 }
 
-inline int getID (char input) {
-	return input - 97;
-}
-
-inline void FSA () {
-	for (ll i = 0; i < size; i++) {
-		if (i == getID(str[0])) {
-			arr[0][i] = 1;
-		}
-	}
-	x = 0;
-	for (ll i = 1; i < len; i++) {  					//all  str
-		for (ll j = 0; j < size; j++) {					//all char
-			if (getID(str[i]) == j) { 					//match
-				arr[i][j] = i+1;						//jump to i+1
-			} else {									//not match
-				arr[i][j] = arr[x][j];					//jump to last x
-			}
-		}
-		x = arr[x][getID(str[i])];
-	}
-}
-
-inline void print(){
-	for (ll i = 0; i < len; i++) {
-		for (ll j = 0; j < size; j++) {
-			Write(arr[i][j]);
-			putchar(' ');
-		}
-		putchar('\n');	
-	}
-}
-
-int main() {
-	len = readStr(str);
-	FSA();
-	print();
-	Please AC;
+ull f2(int l,int r)
+{
+    return H2[l]-H2[r+1]*p[r-l+1];
 }
 
 
-
-
-
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    int n,q;
+    cin>>n>>q;
+    string s;
+    cin>>s;
+    int l,r;
+    //初始化
+    p[0]=1;
+    for(int i=1;i<s.length();i++)
+      {
+           p[i]=p[i-1]*M;
+      }
+      s=" "+s;
+        H1[0]=0;
+        H2[s.length()]=0;
+    for(int i=1;i<s.length();i++)
+    {
+        H1[i]=H1[i-1]*M+s[i]-'a';
+        H2[s.length()-i]=H2[s.length()-i+1]*M+s[s.length()-i]-'a';
+    }
+    while(q--)
+    {
+        cin>>l>>r;
+        bool f=(f1(l,r)==f2(l,r));
+        if((r-l+1)%2==0||f)
+            cout<<"Budada\n";
+        else cout<<"Putata\n";
+    }
+    return 0;
+}

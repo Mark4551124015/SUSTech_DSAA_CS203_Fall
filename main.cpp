@@ -1,182 +1,125 @@
 #include <cstdio>
-#include <cmath>
 #include <cstring>
-#include <string>
-#define maxArray 80100
-#define maxBlock 283
-#define ll int
+#include <algorithm>
+#include <set>
+#include <vector>
+#include <cmath>
+
+#define ull unsigned long long
+#define MAX_SIZE 300005
+#define base 2333ull
+
 using namespace std;
 
-ll n, m, cntBlock = 0 , MaxNum = 0, range[maxData];
-        ll tmp;
+ull p[MAX_SIZE];
 
-inline ll read() {
-    ll x = 0, f = 1;
-    char c = getchar();
-    while (c < '0' || c>'9') { if (c == '-') f = -1; c = getchar(); }
-    while (c >= '0' && c <= '9') x = x * 10 + c - '0', c = getchar();
-    return x * f;
-}
-inline char readAlpha() {
-	char c = getchar();
-	while (!isalpha(c)) {
-		c = getchar();
-	}
-	return c;
-}
-inline void Write(ll x)
-{
-    if(x<0)
-        putchar('-'),x=-x;
-    if(x>9)
-        Write(x/10);
-    putchar(x%10+'0');
-}
+struct hashMap {
+    int len;
+    vector<ull> hash;
 
+    void init(char *sin) {
+        len = strlen(sin);
 
-struct Node{
-	ll prev, next;
-	ll array[maxBlock*2+5],cntS[maxData/maxBlock+5],cnt[maxData],size;
-	void InsertBlock();
-}B[maxData/maxBlock],temp;
-
-inline void InsertBlock(ll index) {
-	cntBlock++;
-	B[cntBlock].next = B[index].next;
-	B[B[index].next].left = cntBlock;
-	B[index].next = cntBlock;
-	B[cntBlock].left = index;
-}
-
-inline void goToBlock(ll *index, ll *pos) {
-	*index = 1;
-	while (*pos > B[*index].size) {
-		*pos -= B[*index].size;
-		*index = B[*index].right;
-	}
-}
-
-inline void split(ll index) {
-	InsertBlock(index);
-	B[cntBlock].size = maxBlock;
-	B[index].size -= B[cntBlock].size;
-	memcpy(B[cntBlock].array, B[index].array + B[index].size, maxBlock * sizeof(ll));
-	memcpy(B[cntBlock].cntS, B[index].cntS, sizeof B[index].cntS);
-	memcpy(B[cntBlock].cnt, B[index].cnt, sizeof B[index].cnt);
-	for (ll i = 0; i < maxBlock; i++) {
-		B[index].cntS[range[B[cntBlock].array[i]]]--;
-		B[index].cnt[B[cntBlock].array[i]]--;
-	}
-}
-
-inline void Insert(ll pos, ll data) {
-    ll index;
-    goToBlock(&index,&pos);
-    for (ll i = B[index].size; i > pos; i--) {
-        B[index].array[i] = B[index].array[i-1];
+        hash.push_back(0ull);
+        for (int i = 0; i < len; ++i) {
+            hash.push_back(hash.back() * base + (sin[i] - 'a'));
+        }
+        hash.push_back(0ull);
     }
-	B[index].array[pos] = data;
-	B[index].size++;
-	for (ll i = index; i; i = B[i].next) {
-		B[i].cntS[range[data]]++;
-		B[i].cnt[data]++;
-	}
-	if (B[index].size >= 2 * maxBlock) {
-		split(index);
-	}
-}
 
-inline void Modify(ll pos, ll data) {
-    ll index;
-    goToBlock(&index,&pos);
-    ll old_data = B[index].array[pos];
-	B[index].array[pos] = data;
-	for (ll i = index; i; i = B[i].next) {
-		B[i].cntS[range[data]]++;
-		B[i].cnt[data]++;
-        B[i].cntS[range[old_data]]--;
-		B[i].cnt[old_data]--;
-        index = B[index].next;
-	}
-}
+    ull checkHash(int l, int r) {
+        return hash[r] - hash[l - 1] * p[r - l + 1];
+    }
 
-inline void Query(ll l, ll r, ll k) {
-	ll leftBlock=1,rightBlock=1;
-	goToBlock(&leftBlock, &l);
-	goToBlock(&rightBlock, &r);
-	ll out = 0;
-    if (leftBlock == rightBlock) {
-        for (ll i = l - 1, j = r - 1, tmp;i <= j; i++) {
-			tmp = B[leftBlock].array[i];
-			temp.cntS[range[tmp]]++;
-			temp.cnt[tmp]++;
-		}
-		for (ll i = 1; i <= range[maxData - 1]; i++) {
-			if (temp.cntS[i] >= k) {
-				for (ll j = (i - 1) * maxBlock;;j++) {
-					if (k <= temp.cnt[j]) {
-						out = j;
-                        return out;
-					} else {
-						k -= temp.cnt[j];
-					}
-				}
-				break;
-			} else {
-				k -= temp.cntS[i];
-			}
-		}
-        for (ll i = l - 1, j = r - 1, tmp;i <= j; i++) {
-			tmp = B[leftBlock].array[i];
-			temp.cntS[range[tmp]]--;
-			temp.cnt[tmp]--;
-		}
+} ha1, ha2, re1;
+
+void init();
+
+bool checkByLen(int len);
+
+int main() {
+    init();
+    int s = min(ha1.len, ha2.len);
+
+    int olen = ceil((double) s / 2), elen = s / 2 + 1;
+    int odd[olen], even[elen];
+    for (int i = 0; i < olen; ++i) {
+        odd[i] = i * 2 + 1;
+    }
+    for (int i = 0; i < elen; ++i) {
+        even[i] = i * 2;
+    }
+
+    int ans = 0;
+
+    int l = 0, r = olen - 1;
+    int m;
+    while (l <= r) {
+        m = (l + r) / 2;
+        if (checkByLen(odd[m])) {
+            ans = max(ans, odd[m]);
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
+    }
+
+    l = 0, r = elen - 1;
+    while (l <= r) {
+        m = (l + r) / 2;
+        if (checkByLen(even[m])) {
+            ans = max(ans, even[m]);
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
+    }
+
+    if (ans == 0) {
+        printf("%d", -1);
     } else {
-		for (ll i = l - 1; i < B[leftBlock].size; i++) {
-			tmp = B[leftBlock].array[i];
-			temp.cntS[range[tmp]]++;
-			temp.cnt[tmp]++;
-		}
-		for (ll i = 0; i < r; i++) {
-			tmp = B[rightBlock].array[i];
-			temp.cntS[range[tmp]]++;
-			temp.cnt[tmp]++;
-		}
-
-        for (ll i = 1; i <= range[MaxNum]; i++) {
-			tmp = B[rightBlock].cntS[i] - B[leftBlock].cntS[i] + temp.cntS[i];
-			if (tmp >= k) {
-				for (ll j = (i - 1) * maxBlock, res;;j++) {
-					res =  B[rightBlock].cnt[j] - B[leftBlock].cnt[j] + temp.cnt[j];
-					if (k <= res) {
-						out = j;
-						return out;
-					}
-					else {
-						k -= res;
-					}	
-				}
-                break;
-			} else {
-				k -= tmp;
-			}
-		}
-        for (ll i = l - 1; i < B[leftBlock].size; i++) {
-			tmp = B[leftBlock].array[i];
-			temp.cntS[range[tmp]]--;
-			temp.cnt[tmp]--;
-		}
-		for (ll i = 0; i < r; i++) {
-			tmp = B[rightBlock].array[i];
-			temp.cntS[range[tmp]]--;
-			temp.cnt[tmp]--;
-		}
+        printf("%d", ans);
     }
 }
 
+bool checkByLen(int k) {
+    set<ull> pals;
 
+    int l, r;
+    ull ha, re;
+    for (int i = 1; i <= ha1.len - (k - 1); ++i) {
+        l = i;
+        r = i + (k - 1);
+        ha = ha1.checkHash(l, r);
+        re = re1.checkHash(ha1.len - r + 1, ha1.len - l + 1);
+        if (ha == re) {
+            pals.insert(ha);
+        }
+    }
 
+    for (int i = 1; i <= ha2.len - (k - 1); ++i) {
+        l = i;
+        r = i + (k - 1);
+        if (pals.find(ha2.checkHash(l, r)) != pals.end()) {
+            return true;
+        }
+    }
+    return false;
+}
 
+void init() {
+    p[0] = 1;
+    for (int i = 1; i < MAX_SIZE; ++i) {
+        p[i] = p[i - 1] * base;
+    }
+    char s1[MAX_SIZE], s2[MAX_SIZE];
+    scanf("%s%s", s1, s2);
+    ha1.init(s1);
+    ha2.init(s2);
 
-
-
+    char sre1[ha1.len];
+    for (int i = 0; i < ha1.len; ++i) {
+        sre1[i] = s1[ha1.len - 1 - i];
+    }
+    re1.init(sre1);
+}

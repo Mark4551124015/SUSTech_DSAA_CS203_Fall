@@ -5,8 +5,8 @@
 #define maxData (int)1e5+1
 #define ll int
 #define size 26
-#define Please
-#define AC
+#define Please return
+#define AC 0
 using namespace std;
 ll x, len;
 ll arr[maxData][size];

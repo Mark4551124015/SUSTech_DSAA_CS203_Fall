@@ -4,6 +4,7 @@
 #include <set>
 #include <vector>
 #include <cmath>
+
 #define ull unsigned long long
 #define MAX_SIZE 300005
 #define base 2333ull
@@ -102,4 +103,25 @@ bool checkByLen(int k) {
         if (pals.find(ha2.checkHash(l, r)) != pals.end()) {
             return true;
         }
-  
+    }
+    return false;
+}
+
+void init() {
+    p[0] = 1;
+    for (int i = 1; i < MAX_SIZE; ++i) {
+        p[i] = p[i - 1] * base;
+    }
+
+    char s1[MAX_SIZE], s2[MAX_SIZE];
+    scanf("%s%s", s1, s2);
+
+    ha1.init(s1);
+    ha2.init(s2);
+
+    char sre1[ha1.len];
+    for (int i = 0; i < ha1.len; ++i) {
+        sre1[i] = s1[ha1.len - 1 - i];
+    }
+    re1.init(sre1);
+}

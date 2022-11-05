@@ -8,8 +8,6 @@
 #pragma G++ optimize(2)
 #define Please return
 #define AC 0
-#define ， ,
-#define “ "
 
 
 
@@ -60,7 +58,6 @@ inline void merge(ll arr[], ll tempArr[], ll left, ll mid, ll right) {
        left++;
    }
 }
-
 inline void mS(ll arr[], ll tempArr[], ll left, ll right ){
    if (left < right) {
        //spit then merge
