@@ -43,11 +43,15 @@ inline void Write(ull x)
     putchar(x%10u+'0');
 }
 inline void print(ull arr[], ull len) {
+    if (len < 1) {
+        return;
+    }
     for (ull i = 0u; i < len; i++) {
         printf("%lld ", arr[i]);
     }
     printf("\n");
 }
+
 inline bool find(ull arr[], ull len, ull target) {
     ull max = len - 1u, min = 0u, index;
     while (max >= min && max < ullMax) {
@@ -158,9 +162,3 @@ int main() {
     Write(ans);
     Please AC;
 }
-
-
-
-
-
-

@@ -1,9 +1,7 @@
 
 .vscode/
 out/
-.idea.
+.idea/
 cmake-build-debug/
 build/
-
-cmake-build-debug/.ninja_log
-.vscode/
+.DS_Store
