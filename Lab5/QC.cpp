@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstring>
 #include <string>
+#pragma G++ optimize(2)
 #define maxData (int)1e5+1
 #define ll int
 #define size 26

@@ -9,9 +9,6 @@
 #define Please return
 #define AC 0
 
-
-
-
 //Fast RW
 inline ll read() {
     ll x = 0, f = 1;
@@ -70,42 +67,6 @@ inline void mS(ll arr[], ll tempArr[], ll left, ll right ){
 inline void mergeSort(ll arr[], ll len) {
    ll tempArr[200000];
    mS(arr, tempArr, 0, len-1);
-}
-
-//Merge Sort for LinkNodes
-inline void merge(Block *arr[], Block *tempArr[], ll left, ll mid, ll right) {
-    ll j = left;       
-    ll k = mid+1;      
-    ll index = left;   
-    while (j <= mid && k <= right) {
-        if (arr[j]->data < arr[k]->data) {
-            tempArr[index++] = arr[j++];
-        } else {
-            tempArr[index++] = arr[k++];
-        }
-    }
-    while (j <= mid) {
-        tempArr[index++] = arr[j++];
-    }
-    while (k <= right) {
-        tempArr[index++] = arr[k++];
-    }
-    while (left <= right) {
-        arr[left] = tempArr[left];
-        left++;
-    }
-}
-inline void mS(Block *arr[], Block *tempArr[], ll left, ll right ){
-    if (left < right) {
-        //spit then merge
-        ll mid = (left+right)/2;
-        mS(arr, tempArr, left, mid);
-        mS(arr, tempArr, mid+1, right);
-        merge(arr, tempArr, left, mid ,right);
-    }
-}
-inline void mergeSort(Block *arr[], ll len) {
-    mS(arr, tempArr, 0, len-1);
 }
 
 //Heap Sort

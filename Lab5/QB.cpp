@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <algorithm>
+#pragma G++ optimize(2)
 #define ull unsigned long long
 #define ll long long
 #define maxData (ull)3e5+10
@@ -10,7 +11,6 @@
 #define AC 0
 #define scale 13ull
 #define startP 97ull
-#pragma G++ optimize(2)
 
 using namespace std;
 ull lenFir, lenSec, lenHushPal, lenOdd, lenEven;
