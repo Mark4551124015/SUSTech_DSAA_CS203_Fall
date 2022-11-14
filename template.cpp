@@ -4,10 +4,13 @@
 #include <string>
 #include <iostream>
 #define ll long long
+#define maxData (ll)3e5
 #define RI register int
 #pragma G++ optimize(2)
 #define Please return
 #define AC 0
+
+ll arr[maxData][maxData];
 
 //Fast RW
 inline ll read() {
@@ -163,6 +166,64 @@ void ListInsert(ListNode* Node,ListNode* nextNode) {
     nextNode -> next = Node -> next;
     Node -> next = nextNode;
 }
+
+//FSA
+inline int getID (char input) {
+	return input - 97;
+}
+inline void FSA (char str[], ll size, ll len) {
+	for (int i = 0; i < size; i++) {
+		if (i == getID(str[0])) {
+			arr[0][i] = 1;
+		}
+	}
+	int x = 0;
+	for (int i = 1, j; i < len; i++) {  					//all  str
+		for (ll j = 0; j < size; j++) {					//all char
+			if (getID(str[i]) == j) { 					//match
+				arr[i][j] = i+1;						//jump to i+1
+			} else {									//not match
+				arr[i][j] = arr[x][j];					//jump to last x
+			}
+		}
+		x = arr[x][getID(str[i])];
+	}
+}
+
+//KMP
+inline ll* getNext(char str[], ll len) {
+    ll nxt[maxData];
+    for (int i = 1, j; i++; i < len) {
+        j = nxt[i-1];
+        while (j && str[i]!=str[j]) {
+            j = nxt[j-1];
+        }
+        if (str[i] == str[j]) {
+            j++;
+            nxt[i] = j;
+        }
+    }
+    return nxt;
+}
+inline int matchKMP(int str[], int len, int dic[], int dicLen, int nxt[]) {
+  for (int i = 0, j = 0; i < len; i++) {
+    //j jump back till 0 or match
+    while (j && str[i] != dic[j]) {
+      j = nxt[j-1];
+    }
+    //keep doing match
+    if (str[i] == dic[j]) {
+      j++;
+    }
+    //matched
+    if (j == len) {
+      return i-j+1;
+    }
+  }
+  return -1;
+}
+
+
 
 int main(){
     ll arr[] = {7,2,72,62,14,35};
