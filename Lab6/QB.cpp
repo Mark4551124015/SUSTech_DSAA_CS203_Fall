@@ -49,23 +49,19 @@ inline void Write(ll x)
         Write(x/10);
     putchar(x%10+'0');
 }
-int n,u,v,m,out;
-
+int n,u,v,m;
 struct Node{
     vector<int> con;
     bool G,V;
     int data;
 }g[N];
-queue<int> tmp;
 vector<int> giant;
-
+queue<int> tmp;
 inline void init() {
-    // n = read();
-    scanf("%lld",&n);
+    n = read();
     rep(i,1,n-1) {
-        // u = read();
-        // v = read();
-        scanf("%lld%lld",&u,&v);
+        u = read();
+        v = read();
         g[u].con.pb(v);
         g[v].con.pb(u);
     }
@@ -75,39 +71,37 @@ inline void init() {
     }
 }
 
-inline int bfs(int startP){
-    giant.clear();
-    g[startP].V=true;
-    tmp.push(startP);
-    g[startP].data = g[startP].G-1;
+inline void bfs(){
+    g[1].V=true;
+    tmp.push(1);
+    g[1].data = g[1].G-1;
+
     while (!tmp.empty()) {
-        int cur = tmp.front();
-        g[cur].data++;
-        if (g[cur].G) giant.push_back(g[cur].data);
-        for (int i : g[cur].con) {
+        g[tmp.front()].data++;
+        if (g[tmp.front()].G) giant.push_back(g[tmp.front()].data);
+
+        for (int i : g[tmp.front()].con) {
             if (!g[i].V) {
                 g[i].V=true;
                 tmp.push(i);
-                g[i].data=g[cur].data;
+                g[i].data=g[tmp.front()].data;
             }
         }
         tmp.pop();
     }
-    rep(i,0,giant.size()-1) {
-        if (giant[i]<=giant[i-1] && i > 0) {
-            giant[i] = giant[i-1]+1;
-        }
-        // printf("%lld ", giant[i]);
+
+    for (int i : giant) {
+        printf("%lld ", i);
     }
-    // putchar('\n');
-    return giant.back();
+
+
+
+
 }
 
 signed main() {
     init();
-    g[1].V=true;
-    for (int i : g[1].con) {
-        out = max(bfs(i),out);
-    }
-    Write(out);
+    bfs();
+    
+
 }
