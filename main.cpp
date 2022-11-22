@@ -67,7 +67,6 @@ inline void debug(int x) {
 
 inline bool isCutted(int node) {
     if (g[node].cutted) {
-        debug(111);
         return true;
     }
     if (tmp!=root && node == root) {
@@ -97,10 +96,14 @@ inline int dfsSize(ll node, ll lastNode) {
 
 inline void findCom(){
     for (pair<pii,int> index : query) {
+        printf("now cutting: %d\n", index.x.y);
+
         if (!com) {
+
             break;
         }
         if (isCutted(index.x.y)) {
+            debug(111);
             continue;
         }
         g[index.x.y].cutted = true;
@@ -108,11 +111,12 @@ inline void findCom(){
         if (g[index.x.x].parent == index.x.y) {
             tmp = index.x.x;
             com = g[tmp].size;
+            continue;
         }
-        printf("now cutting: %d\n", index.x.y);
         com -= g[index.x.y].size;
     }
-    debug(com);
+
+    // debug(com);
 
 
 
