@@ -9,13 +9,13 @@ using namespace std;
 #define Please return
 #define AC 0
 #define pii pair<int, int>
-#define N (int)500100
-#define rep(i,a,b) for(int i=(a);i<=(b);i++)
-#define dwn(i,a,b) for(int i=(a);i>=(b);i--)
+#define N (int)400100
 #define all(x) (x).begin(), (x).end() 
 #define pb push_back
 #define x first
 #define y second
+#define isDebug true
+
 //Fast RW
 inline ll read() {
     ll x = 0, f = 1;
@@ -49,65 +49,118 @@ inline void Write(ll x)
         Write(x/10);
     putchar(x%10+'0');
 }
-int n,u,v,m,out;
-
+int n,u,v,w,m;
+int root, ans, com, tmp;
+vector<pair<pii,int>> query;
 struct Node{
     vector<int> con;
-    bool G,V;
-    int data;
+    bool cutted;
+    int parent;
+    int size;
 }g[N];
-queue<int> tmp;
-vector<int> giant;
 
-inline void init() {
-    // n = read();
-    scanf("%lld",&n);
-    rep(i,1,n-1) {
-        // u = read();
-        // v = read();
-        scanf("%lld%lld",&u,&v);
+vector<int> T[N];
+
+inline void debug(int x) {
+    if (isDebug) printf("%lld ",x);
+}
+
+inline bool isCutted(int node) {
+    if (g[node].cutted) {
+        debug(111);
+        return true;
+    }
+    if (tmp!=root && node == root) {
+        com = 0;
+        return true;
+    }
+
+    if (g[node].parent == tmp) {
+        return false;
+    }
+    return isCutted(g[node].parent);
+}
+
+inline int dfsSize(ll node, ll lastNode) {
+    int cnt = 0;
+    g[node].parent = lastNode;
+    for (ll i = 0; i < g[node].con.size(); i++) {
+        if (g[node].con.at(i) == lastNode) {
+            continue;
+        }
+        cnt += dfsSize(g[node].con.at(i), node);
+    }
+    g[node].size = cnt+1;
+    // debug(cnt+1);
+    return g[node].size;
+}
+
+inline void findCom(){
+    for (pair<pii,int> index : query) {
+        if (!com) {
+            break;
+        }
+        if (isCutted(index.x.y)) {
+            continue;
+        }
+        g[index.x.y].cutted = true;
+
+        if (g[index.x.x].parent == index.x.y) {
+            tmp = index.x.x;
+            com = g[tmp].size;
+        }
+        printf("now cutting: %d\n", index.x.y);
+        com -= g[index.x.y].size;
+    }
+    debug(com);
+
+
+
+
+}
+
+bool handle(int u, int v, int na) {
+    if (g[u].parent == v) {
+        swap(u,v);
+    } 
+    int rem = g[root].size - g[v].size;
+    if (ans >= na && rem >= na) {
+        return true;
+    } else {
+        ans = -1;
+        return false;
+    }
+    return false;
+
+
+    
+}
+
+inline void solution() {
+    n=read();
+    for(int i = 0; i < n-1; i++) {
+        u=read();v=read();
         g[u].con.pb(v);
         g[v].con.pb(u);
     }
-    m = read();
-    rep(i,1,m) {
-        g[read()].G=true;
+    int comSize = g[root].size;
+    m=read();
+    for (int i = 0; i < m; i++) {
+        u = read(); v = read(); w = read();
+        query.pb({{u,v},w});
     }
-}
+    root = query.front().x.x;
 
-inline int bfs(int startP){
-    giant.clear();
-    g[startP].V=true;
-    tmp.push(startP);
-    g[startP].data = g[startP].G-1;
-    while (!tmp.empty()) {
-        int cur = tmp.front();
-        g[cur].data++;
-        if (g[cur].G) giant.push_back(g[cur].data);
-        for (int i : g[cur].con) {
-            if (!g[i].V) {
-                g[i].V=true;
-                tmp.push(i);
-                g[i].data=g[cur].data;
-            }
-        }
-        tmp.pop();
-    }
-    rep(i,0,giant.size()-1) {
-        if (giant[i]<=giant[i-1] && i > 0) {
-            giant[i] = giant[i-1]+1;
-        }
-        // printf("%lld ", giant[i]);
-    }
-    // putchar('\n');
-    return giant.back();
+    tmp = root;
+    com = dfsSize(root, root);
+    findCom();
+
+
+
+
 }
 
 signed main() {
-    init();
-    g[1].V=true;
-    for (int i : g[1].con) {
-        out = max(bfs(i),out);
-    }
-    Write(out);
+    solution();
+    Please AC;
 }

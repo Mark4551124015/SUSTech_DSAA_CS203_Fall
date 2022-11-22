@@ -9,13 +9,12 @@ using namespace std;
 #define Please return
 #define AC 0
 #define pii pair<int, int>
-#define N (int)500100
-#define rep(i,a,b) for(int i=(a);i<=(b);i++)
-#define dwn(i,a,b) for(int i=(a);i>=(b);i--)
+#define N (int)400100
 #define all(x) (x).begin(), (x).end() 
 #define pb push_back
 #define x first
 #define y second
+
 //Fast RW
 inline ll read() {
     ll x = 0, f = 1;
@@ -49,59 +48,65 @@ inline void Write(ll x)
         Write(x/10);
     putchar(x%10+'0');
 }
-int n,u,v,m;
+int n,u,v,m,out,t,last;
+
 struct Node{
     vector<int> con;
     bool G,V;
     int data;
 }g[N];
-vector<int> giant;
 queue<int> tmp;
+vector<int> giant;
+
 inline void init() {
-    n = read();
-    rep(i,1,n-1) {
-        u = read();
-        v = read();
+    n =read();
+    for(int i = 0; i < n-1; i++) {
+        u=read();v=read();
         g[u].con.pb(v);
         g[v].con.pb(u);
     }
-    m = read();
-    rep(i,1,m) {
-        g[read()].G=true;
+    m=read();
+    for(int i = 0; i < m; i++) {
+        t=read();
+        g[t].G=true;
     }
 }
 
-inline void bfs(){
-    g[1].V=true;
-    tmp.push(1);
-    g[1].data = g[1].G-1;
-
+inline int bfs(int startP){
+    giant.clear();
+    g[startP].V=true;
+    tmp.push(startP);
+    g[startP].data = 0;
     while (!tmp.empty()) {
-        g[tmp.front()].data++;
-        if (g[tmp.front()].G) giant.push_back(g[tmp.front()].data);
-
-        for (int i : g[tmp.front()].con) {
+        int cur = tmp.front();
+        g[cur].data++;
+        if (g[cur].G) giant.push_back(g[cur].data);
+        for (int i : g[cur].con) {
             if (!g[i].V) {
                 g[i].V=true;
                 tmp.push(i);
-                g[i].data=g[tmp.front()].data;
+                g[i].data=g[cur].data;
             }
         }
         tmp.pop();
     }
-
-    for (int i : giant) {
-        printf("%lld ", i);
+    for(int i=0; i < giant.size(); i++) {
+        if ( i > 0 && giant[i]<=giant[i-1]) {
+            giant[i] = giant[i-1]+1;
+        }
     }
-
-
-
-
+    if (giant.empty()) {
+        return 0;
+    }
+    return giant.back();
 }
 
 signed main() {
     init();
-    bfs();
-    
-
+    g[1].V=true;
+    for (int i : g[1].con) {
+        out = max(bfs(i),out);
+    }
+    Write(out);
+    Please AC;
 }
