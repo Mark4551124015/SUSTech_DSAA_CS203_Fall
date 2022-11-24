@@ -60,7 +60,7 @@ struct Node{
     pii range;
     int parent;
     int size;
-}g[N];
+}g[N],origin[N];
 
 inline int dfsSize(ll node, ll lastNode) {
     int cnt = 0;
