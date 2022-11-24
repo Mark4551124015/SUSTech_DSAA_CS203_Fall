@@ -9,12 +9,12 @@ using namespace std;
 #define Please return
 #define AC 0
 #define pii pair<int, int>
-#define N (int)400100
+#define N (int)500010
 #define all(x) (x).begin(), (x).end() 
 #define pb push_back
 #define x first
 #define y second
-#define isDebug true
+#define isDebug false
 
 //Fast RW
 inline ll read() {
@@ -50,36 +50,21 @@ inline void Write(ll x)
     putchar(x%10+'0');
 }
 int n,u,v,w,m;
-int root, ans, com, tmp;
+int root, ans, l ,r, mid;
+bool flag,good;
 vector<pair<pii,int>> query;
 struct Node{
     vector<int> con;
-    bool cutted;
+    pii range;
     int parent;
     int size;
-}g[N];
-
-vector<int> T[N];
+}g[N],origin[N];
 
 inline void debug(int x) {
     if (isDebug) printf("%lld ",x);
 }
 
-inline bool isCutted(int node) {
-    if (g[node].cutted) {
-        return true;
-    }
-    if (tmp!=root && node == root) {
-        com = 0;
-        return true;
-    }
-
-    if (g[node].parent == tmp) {
-        return false;
-    }
-    return isCutted(g[node].parent);
-}
-
+//debugged
 inline int dfsSize(ll node, ll lastNode) {
     int cnt = 0;
     g[node].parent = lastNode;
@@ -90,78 +75,119 @@ inline int dfsSize(ll node, ll lastNode) {
         cnt += dfsSize(g[node].con.at(i), node);
     }
     g[node].size = cnt+1;
-    // debug(cnt+1);
+    g[node].range = {0,g[node].size};
     return g[node].size;
 }
 
-inline void findCom(){
-    for (pair<pii,int> index : query) {
-        printf("now cutting: %d\n", index.x.y);
-
-        if (!com) {
-
-            break;
-        }
-        if (isCutted(index.x.y)) {
-            debug(111);
+inline void resetNode(ll node, ll lastNode){
+    for (ll i = 0; i < g[node].con.size(); i++) {
+        if (g[node].con.at(i) == lastNode) {
             continue;
         }
-        g[index.x.y].cutted = true;
-
-        if (g[index.x.x].parent == index.x.y) {
-            tmp = index.x.x;
-            com = g[tmp].size;
-            continue;
-        }
-        com -= g[index.x.y].size;
+        resetNode(g[node].con.at(i), node);
     }
-
-    // debug(com);
-
-
-
-
+    g[node].range = {0,g[node].size};
 }
 
-bool handle(int u, int v, int na) {
-    if (g[u].parent == v) {
-        swap(u,v);
-    } 
-    int rem = g[root].size - g[v].size;
-    if (ans >= na && rem >= na) {
+//debug
+inline void showRange(int node, int lastNode){
+    for (ll i = 0; i < g[node].con.size(); i++) {
+        if (g[node].con.at(i) == lastNode) {
+            continue;
+        }
+        showRange(g[node].con.at(i), node);
+    }
+    // if (g[node].range.x != 0 && g[node].range.y != n || true) {
+        printf("Node %lld, range: %lld %lld; \n", node, g[node].range.x,g[node].range.y);
+    // }
+}
+//debugged
+inline pii cross(pii a, pii b) {
+    pii p = {max(a.x,b.x), min(a.y,b.y)};
+    return p;
+}
+//debugged
+inline pii sumRange(pii a, pii b) {
+    return {a.x+b.x, a.y+b.y};
+}
+
+inline pii getRange(int node) {
+    pii tmp = {0,0};
+    for (int i : g[node].con) {
+        if (i == g[node].parent) {
+            if (g[node].con.size()==1) {
+                return g[node].range;
+            }
+            continue;
+        }
+        tmp = sumRange(tmp, getRange(i));
+    }
+    tmp.y = tmp.y+1;
+    g[node].range = cross(tmp, g[node].range);
+    if (g[node].range.x > g[node].range.y) {
+        good = false;
+    }
+    return g[node].range;
+}
+
+
+inline bool check (int input) {
+    resetNode(root,0);
+    pii range;
+    for (pair<pii,int> p : query) {
+        if (g[p.x.x].parent == p.x.y) {
+            g[p.x.x].range = cross(g[p.x.x].range, {p.y, g[p.x.x].size});
+            range = g[p.x.x].range;
+        } else {
+            g[p.x.y].range = cross(g[p.x.y].range, {0, input - p.y});
+            range = g[p.x.y].range; 
+        }
+        if (range.x>range.y) {
+            return false;
+        }
+    }
+    good = true;
+    range = getRange(root);
+    if (input >= range.x && input <= range.y && good) {
         return true;
-    } else {
-        ans = -1;
-        return false;
     }
     return false;
-
-
-    
 }
 
+
 inline void solution() {
-    n=read();
+    n=read(); 
+    g[u].con.pb(v);
+    g[v].con.pb(u);
     for(int i = 0; i < n-1; i++) {
         u=read();v=read();
         g[u].con.pb(v);
         g[v].con.pb(u);
     }
-    int comSize = g[root].size;
+    root = u;
     m=read();
     for (int i = 0; i < m; i++) {
         u = read(); v = read(); w = read();
+
         query.pb({{u,v},w});
     }
-    root = query.front().x.x;
-
-    tmp = root;
-    com = dfsSize(root, root);
-    findCom();
-
-
-
-
+    l = 0; r = n; 
+    mid = (l+r)/2;
+    dfsSize(root,0);
+    while (l<=r) {
+        mid = (l+r)/2;
+        if (check(mid)) {
+            r = mid - 1;
+            ans = mid;
+        } else {
+            l = mid + 1;
+        }   
+    }
+    if (ans) {
+        Write(ans);
+    }else {
+        Write (-1);
+    }
 }
 
 signed main() {

@@ -203,7 +203,7 @@ inline void init() {
 		range[i]=i/maxBlock+1;
 	}
 	cntBlock=range[n-1];
-	for(ll i=0;i<n;i++){
+	for(ll i=0;i<n;i++) {
 		ll id = range[i], input;
 		input = read();
 		B[id].array[B[id].size] = input;
@@ -212,8 +212,7 @@ inline void init() {
 		B[id].size++;
 		MaxNum = MaxNum >= input ? MaxNum : input;
 	}
-	for(ll i=2;i<=cntBlock;i++)
-	{
+	for(ll i=2;i<=cntBlock;i++) {
 		B[i-1].right=i, B[i].left=i-1;
 		for(ll j=0;j<=MaxNum;j++){
 			B[i].cnt[j] += B[i-1].cnt[j];

@@ -1,60 +1,193 @@
+#include <cstdio>
+#include <vector>
 #include<iostream>
-#include<cstring>
-#include<cmath>
-#include<algorithm>
-#include<stack>
 #include<queue>
-#include<vector>
+#define ll long long
+#define int ll
+#pragma G++ optimize(2)
 using namespace std;
+#define Please return
+#define AC 0
+#define pii pair<int, int>
+#define N (int)500010
+#define all(x) (x).begin(), (x).end() 
 #define pb push_back
- 
-#define debug(x) cerr << #x << ": " << (x) << endl
-#define rep(i,a,b) for(int i=(a);i<=(b);i++)
-#define dwn(i,a,b) for(int i=(a);i>=(b);i--)
-#define all(x) (x).begin(), (x).end()
- 
-#define int long long
- 
 #define x first
 #define y second
-#define pii pair<int, int>
-using ll = long long;
- 
-inline void read(int &x){
-    int s=0; x=1;
-    char ch=getchar();
-    while(ch<'0' || ch>'9') {if(ch=='-')x=-1;ch=getchar();}
-    while(ch>='0' && ch<='9') s=(s<<3)+(s<<1)+ch-'0',ch=getchar();
-    x*=s;
+#define isDebug false
+
+//Fast RW
+inline ll read() {
+    ll x = 0, f = 1;
+    char c = getchar();
+    while (c < '0' || c>'9') { if (c == '-') f = -1; c = getchar(); }
+    while (c >= '0' && c <= '9') x = x * 10 + c - '0', c = getchar();
+    return x * f;
+}
+inline void read(int& a)
+{
+	int s = 0, w = 1;
+	char ch = getchar();
+	while (ch < '0' || ch>'9')
+	{
+		if (ch == '-')
+			w = -1;
+		ch = getchar();
+	}
+	while (ch >= '0' && ch <= '9')
+	{
+		s = s * 10 + ch - '0';
+		ch = getchar();
+	}
+	a = s * w;
+}
+inline void Write(ll x)
+{
+    if(x<0)
+        putchar('-'),x=-x;
+    if(x>9)
+        Write(x/10);
+    putchar(x%10+'0');
+}
+int n,u,v,w,m;
+int root, ans, l ,r, mid;
+bool flag,good;
+vector<pair<pii,int>> query;
+struct Node{
+    vector<int> con;
+    pii range;
+    int parent;
+    int size;
+}g[N];
+
+inline void debug(int x) {
+    if (isDebug) printf("%lld ",x);
 }
 
-const int N=5e5+5;
-
-int n, need;
-vector<pii> g[N];
-int res;
-
-void dfs(int u, int fa, int val){
-	if(g[u].size()==1){
-		if(val==need) res++;
-	}
-	
-	for(pii e: g[u]){
-		int go=e.x, w=e.y;
-		if(go==fa) continue;
-		dfs(go, u, val+w);
-	}
+//debugged
+inline int dfsSize(ll node, ll lastNode) {
+    int cnt = 0;
+    g[node].parent = lastNode;
+    for (ll i = 0; i < g[node].con.size(); i++) {
+        if (g[node].con.at(i) == lastNode) {
+            continue;
+        }
+        cnt += dfsSize(g[node].con.at(i), node);
+    }
+    g[node].size = cnt+1;
+    g[node].range = {0,g[node].size};
+    return g[node].size;
 }
 
-signed main(){
-	// memset(h, -1, sizeof h);
-	cin>>n>>need;
-	rep(i, 1, n-1){
-		int u, v, w; read(u), read(v), read(w);
+//debug
+inline void showRange(int node, int lastNode){
+    for (ll i = 0; i < g[node].con.size(); i++) {
+        if (g[node].con.at(i) == lastNode) {
+            continue;
+        }
+        showRange(g[node].con.at(i), node);
+    }
+    // if (g[node].range.x != 0 && g[node].range.y != n || true) {
+        printf("Node %lld, range: %lld %lld; \n", node, g[node].range.x,g[node].range.y);
+    // }
+}
+//debugged
+inline pii cross(pii a, pii b) {
+    pii p = {max(a.x,b.x), min(a.y,b.y)};
+    return p;
+}
+//debugged
+inline pii sumRange(pii a, pii b) {
+    return {a.x+b.x, a.y+b.y};
+}
 
-		g[u].pb({v, w}),g[u].pb({u,w});
-	}
-	dfs(1, -1, 0);
-	cout<<res<<endl;
-	return 0;
+inline pii getRange(int node) {
+    pii tmp = {0,0};
+    for (int i : g[node].con) {
+        if (i == g[node].parent) {
+            if (g[node].con.size()==1) {
+                return g[node].range;
+            }
+            continue;
+        }
+        tmp = sumRange(tmp, getRange(i));
+    }
+    tmp.y = tmp.y+1;
+    g[node].range = cross(tmp, g[node].range);
+    if (g[node].range.x > g[node].range.y) {
+        good = false;
+    }
+    return g[node].range;
+}
+
+
+inline bool check (int input) {
+    dfsSize(root,0);
+    pii range;
+    for (pair<pii,int> p : query) {
+        if (g[p.x.x].parent == p.x.y) {
+            g[p.x.x].range = cross(g[p.x.x].range, {p.y, g[p.x.x].size});
+            range = g[p.x.x].range;
+        } else {
+            g[p.x.y].range = cross(g[p.x.y].range, {0, input - p.y});
+            range = g[p.x.y].range; 
+        }
+        if (range.x>range.y) {
+            return false;
+        }
+    }
+    good = true;
+    range = getRange(root);
+    if (input >= range.x && input <= range.y && good) {
+        return true;
+    }
+    return false;
+}
+
+
+inline void solution() {
+    // n=read();
+    scanf ("%lld",&n);
+    scanf("%lld%lld", &u, &v);
+    root = u;
+    g[u].con.pb(v);
+    g[v].con.pb(u);
+    for(int i = 1; i < n-1; i++) {
+        // u=read();v=read();
+        scanf("%lld%lld", &u, &v );
+        g[u].con.pb(v);
+        g[v].con.pb(u);
+    }
+
+    // m=read();
+    scanf ("%lld",&m);
+
+    for (int i = 0; i < m; i++) {
+        // u = read(); v = read(); w = read();
+        scanf("%lld%lld%lld", &u, &v ,&w);
+        query.pb({{u,v},w});
+    }
+    l = 0; r = n; 
+    mid = (l+r)/2;
+    dfsSize(root,0);
+    while (l<=r) {
+        mid = (l+r)/2;
+        // printf("checking %lld\n", mid);
+        if (check(mid)) {
+            r = mid - 1;
+            ans = mid;
+        } else {
+            l = mid + 1;
+        }   
+    }
+    if (ans) {
+        Write(ans);
+    }else {
+        Write (-1);
+    }
+}
+
+signed main() {
+    solution();
+    Please AC;
 }
