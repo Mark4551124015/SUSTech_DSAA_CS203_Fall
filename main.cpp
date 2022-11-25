@@ -15,6 +15,7 @@ using namespace std;
 #define x first
 #define y second
 #define isDebug true
+#define ln putchar('\n');
 
 //Fast RW
 inline ll read() {
@@ -62,6 +63,21 @@ inline void debug(int x) {
     if (isDebug) printf("%lld ",x);
 }
 
+inline void showP(){
+    printf("show P: ");
+    for (int i  = 1; i <= n; i++) {
+        debug(g[i].data);
+    }
+    ln;
+}
+
+inline void showL(){
+    printf("show Leaf: ");
+    for (int i : leaf) {
+        debug(g[i].data);
+    }
+    ln;
+}
 //debugged
 inline int dfsMaxSon(int node, int lastNode) {
     if (g[node].con.size()==1 && node != root) {
@@ -77,28 +93,24 @@ inline int dfsMaxSon(int node, int lastNode) {
     }
     return g[node].maxData;
 }
-
-
-inline void dfsOperation (int node, int lastNode, int maxNode) {
-    maxNode = max (maxNode,g[node].data);
-
+inline void dfsOp(int node, int lastNode) {
     if (g[node].con.size()==1 && node != root) {
-        g[node].data = maxNode;
-        sum+=maxNode;
-        leaf.pb(node);
+        g[node].maxData = g[node].data;
     }
-    
+
     for (int i : g[node].con) {
         if (i == lastNode) {
             continue;
         }
-        if (g[i].maxData == g[node].maxData) {
-            dfsOperation(i,node, maxNode);
-        } else {
-            dfsOperation(i,node, 0);
-        }
+        g[node].maxData = max(dfsOp(i,node),g[node].maxData);
     }
+
+
+
+    return g[node].maxData;
 }
+
+
 
 
 inline void solution() {
@@ -120,6 +132,7 @@ inline void solution() {
     root = maxP;
     dfsMaxSon(root,0);
     dfsOperation(root,0,0);
+
     pii t;
     if (! (g[root].con.size() == 1)) {
         for (int i : leaf) {
@@ -132,7 +145,11 @@ inline void solution() {
         }
         sum += g[root].data - g[t.y].data;
         sum += g[root].data - g[t.x].data;
+    } else {
+        sum += g[root].data;
     }
+    showP();
+    showL();
     Write(sum);
 }
 signed main() {

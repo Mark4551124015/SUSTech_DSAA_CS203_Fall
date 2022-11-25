@@ -47,7 +47,7 @@ inline int dfsSize(ll node, ll lastNode) {
     return g[node].size;
 }
 
-void creatData(int n, int m) {
+void creatData(int n) {
     srand(time(0));
 	fstream file(filename.c_str(), ios::out);
 	int *tree = new int [n];
@@ -77,35 +77,22 @@ void creatData(int n, int m) {
 		if (nxt_idx == -1) break;
 	}
     dfsSize(root, 0);
+    int m = random(1,n);
     file << m << endl;
+    bool hush[n];
+    memset(hush, 0 , sizeof(hush));
     for (int i = 0; i < m; i++) {
-        pii p;
-        int a, b;
-        a = random(1,n);
-        int size = g[a].con.size()-1;
-        b = random(0,size);
-        b = g[a].con[b];
-        p.x = a;
-        p.y = b;
-        int na;
-        if (random(0,1)) {
-            swap(p.x,p.y);
+        int g = random(1,n);
+        while (hush[g]) {
+            g = random(1,n);
+            hush[g]=true;
         }
-        if (g[p.x].parent == p.y) {
-            na = random(1,g[p.x].size);
-        } else {
-            na = random(1, n - g[p.y].size);
-        }
-        query.pb({{p.x,p.y},na});
-        file << p.x << ' ' << p.y << ' ' << na << endl;
+
+        file << g << ' ';
     }
 }
 
 signed main()
 {
-
-	    creatData(10, 5);
-
-
-
+	    creatData(10);
 }
