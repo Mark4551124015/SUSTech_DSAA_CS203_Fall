@@ -9,12 +9,12 @@ using namespace std;
 #define Please return
 #define AC 0
 #define pii pair<int, int>
-#define N (int)500010
+#define N (int)200010
 #define all(x) (x).begin(), (x).end() 
 #define pb push_back
 #define x first
 #define y second
-#define isDebug false
+#define isDebug true
 
 //Fast RW
 inline ll read() {
@@ -49,109 +49,55 @@ inline void Write(ll x)
         Write(x/10);
     putchar(x%10+'0');
 }
-int n,u,v,w,m;
-int root, ans, l ,r, mid;
-bool flag,good;
-vector<pair<pii,int>> query;
+int n,u,v,p;
+int root, maxP,sum;
+vector<int> leaf;
 struct Node{
     vector<int> con;
-    pii range;
-    int parent;
-    int size;
-}g[N],origin[N];
+    int data;
+    int maxData;
+}g[N];
 
 inline void debug(int x) {
     if (isDebug) printf("%lld ",x);
 }
 
 //debugged
-inline int dfsSize(ll node, ll lastNode) {
-    int cnt = 0;
-    g[node].parent = lastNode;
-    for (ll i = 0; i < g[node].con.size(); i++) {
-        if (g[node].con.at(i) == lastNode) {
-            continue;
-        }
-        cnt += dfsSize(g[node].con.at(i), node);
+inline int dfsMaxSon(int node, int lastNode) {
+    if (g[node].con.size()==1 && node != root) {
+        g[node].maxData = g[node].data;
+        return g[node].data;
     }
-    g[node].size = cnt+1;
-    g[node].range = {0,g[node].size};
-    return g[node].size;
-}
 
-inline void resetNode(ll node, ll lastNode){
-    for (ll i = 0; i < g[node].con.size(); i++) {
-        if (g[node].con.at(i) == lastNode) {
-            continue;
-        }
-        resetNode(g[node].con.at(i), node);
-    }
-    g[node].range = {0,g[node].size};
-}
-
-//debug
-inline void showRange(int node, int lastNode){
-    for (ll i = 0; i < g[node].con.size(); i++) {
-        if (g[node].con.at(i) == lastNode) {
-            continue;
-        }
-        showRange(g[node].con.at(i), node);
-    }
-    // if (g[node].range.x != 0 && g[node].range.y != n || true) {
-        printf("Node %lld, range: %lld %lld; \n", node, g[node].range.x,g[node].range.y);
-    // }
-}
-//debugged
-inline pii cross(pii a, pii b) {
-    pii p = {max(a.x,b.x), min(a.y,b.y)};
-    return p;
-}
-//debugged
-inline pii sumRange(pii a, pii b) {
-    return {a.x+b.x, a.y+b.y};
-}
-
-inline pii getRange(int node) {
-    pii tmp = {0,0};
     for (int i : g[node].con) {
-        if (i == g[node].parent) {
-            if (g[node].con.size()==1) {
-                return g[node].range;
-            }
+        if (i == lastNode) {
             continue;
         }
-        tmp = sumRange(tmp, getRange(i));
+        g[node].maxData = max(dfsMaxSon(i,node),g[node].maxData);
     }
-    tmp.y = tmp.y+1;
-    g[node].range = cross(tmp, g[node].range);
-    if (g[node].range.x > g[node].range.y) {
-        good = false;
-    }
-    return g[node].range;
+    return g[node].maxData;
 }
 
 
-inline bool check (int input) {
-    resetNode(root,0);
-    pii range;
-    for (pair<pii,int> p : query) {
-        if (g[p.x.x].parent == p.x.y) {
-            g[p.x.x].range = cross(g[p.x.x].range, {p.y, g[p.x.x].size});
-            range = g[p.x.x].range;
+inline void dfsOperation (int node, int lastNode, int maxNode) {
+    maxNode = max (maxNode,g[node].data);
+
+    if (g[node].con.size()==1 && node != root) {
+        g[node].data = maxNode;
+        sum+=maxNode;
+        leaf.pb(node);
+    }
+    
+    for (int i : g[node].con) {
+        if (i == lastNode) {
+            continue;
+        }
+        if (g[i].maxData == g[node].maxData) {
+            dfsOperation(i,node, maxNode);
         } else {
-            g[p.x.y].range = cross(g[p.x.y].range, {0, input - p.y});
-            range = g[p.x.y].range; 
-        }
-        if (range.x>range.y) {
-            return false;
+            dfsOperation(i,node, 0);
         }
     }
-    good = true;
-    range = getRange(root);
-    if (input >= range.x && input <= range.y && good) {
-        return true;
-    }
-    return false;
 }
 
 
@@ -164,32 +110,31 @@ inline void solution() {
         g[u].con.pb(v);
         g[v].con.pb(u);
     }
-    root = u;
-    m=read();
-    for (int i = 0; i < m; i++) {
-        u = read(); v = read(); w = read();
-
-        query.pb({{u,v},w});
+    for (int i = 1; i <= n; i++) {
+        p = read();
+        g[i].data = p;
+        if (p > g[maxP].data) {
+            maxP = i;
+        }
     }
-    l = 0; r = n; 
-    mid = (l+r)/2;
-    dfsSize(root,0);
-    while (l<=r) {
-        mid = (l+r)/2;
-        if (check(mid)) {
-            r = mid - 1;
-            ans = mid;
-        } else {
-            l = mid + 1;
-        }   
+    root = maxP;
+    dfsMaxSon(root,0);
+    dfsOperation(root,0,0);
+    pii t;
+    if (! (g[root].con.size() == 1)) {
+        for (int i : leaf) {
+            if (t.y>t.x) {
+                swap(t.x,t.y);
+            }
+            if (g[t.y].data < g[i].data) {
+                t.y = i;
+            }
+        }
+        sum += g[root].data - g[t.y].data;
+        sum += g[root].data - g[t.x].data;
     }
-    if (ans) {
-        Write(ans);
-    }else {
-        Write (-1);
-    }
+    Write(sum);
 }
-
 signed main() {
     solution();
     Please AC;
