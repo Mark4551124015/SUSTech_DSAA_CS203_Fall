@@ -21,10 +21,8 @@ using namespace std;
 #define ln putchar('\n');
 
 
-string filename = "in.txt";
+string filename = ".vscode/oi/in.txt";
 vector<pair<pii,int>> query;
-
-
 
 struct Node{
     vector<int> con;

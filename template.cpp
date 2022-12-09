@@ -9,6 +9,7 @@
 #pragma G++ optimize(2)
 #define Please return
 #define AC 0
+#define isDebug true
 
 ll arr[maxData][maxData];
 
@@ -28,6 +29,13 @@ inline void Write(ll x)
         Write(x/10);
     putchar(x%10+'0');
 }
+inline void debug(char a[]){
+    if (isDebug) printf("%s ",a);
+}
+inline void debug(int a){
+    if (isDebug) printf("%lld ",a);
+}
+
 //Tools
 inline void swap(ll arr[], ll a, ll b) {
     ll c = arr[a];

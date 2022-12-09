@@ -3,6 +3,7 @@
 #include <iostream>
 #include <queue>
 #include <algorithm>
+#include <cstring>
 #define ll long long
 #define int ll
 #pragma G++ optimize(2)
@@ -11,13 +12,13 @@ using namespace std;
 #define AC 0
 #define pii pair<int, int>
 #define vi vector<int>
-#define N (int)500000
+#define N (int)500010
 #define all(x) (x).begin(), (x).end() 
 #define pb push_back
 #define x first
 #define y second
-#define isDebug false
-#define ln putchar('\n');
+#define isDebug true
+#define ln if(isDebug)putchar('\n');
 
 //Fast RW
 inline ll read() {
@@ -52,167 +53,222 @@ inline void Write(ll x)
         Write(x/10);
     putchar(x%10+'0');
 }
-int T,n,tmp,nodeCnt;
-
-struct Node{
-    int val, pos, ser;
-    int p,n;
-    void join();
+inline void debug(string a){
+    if (isDebug) printf("%s",a.c_str());
+}
+inline void debug(int a){
+    if (isDebug) printf("%lld ",a);
+}
+inline void debug(string a, int b){
+    if (isDebug) printf("%s: %lld\n",a.c_str(),b);
+}
+int n, c, cnt, root;
+vi freeNode; 
+struct node {
+    int l, r, direction; //-1 is left, 1 is right, 0 is none
+    int size, key, h;
 }g[N];
-
-
-
-struct heap{
-    vector<Node> h;
-    void push(int node);
-    Node popPos(int node);
-    Node top();
-    void adjust(int pos);
-}H;
-
-inline void swapNode(int a, int b) {
-    swap (g[a].pos, g[b].pos);
-}
-
-inline bool cmp(Node a, Node b) {
-    return (a.val < b.val) || ( a.val == b.val && a.ser < b.ser);
-}
-
-void heap::push(int node){
-    if (h.empty()) {
-        h.pb(g[node]);
-    }
-    h.pb(g[node]);
-    int i = h.size()-1;
-    while (cmp(h[i], h[i/2])&& i != 1) {
-        swap(h[i],h[i/2]);
-        swapNode(i,i/2);
-        i /= 2;
-    }
-}
-
-Node heap::popPos(int node){
-    Node out = h[node];
-    swap(h[node],h[h.size()-1]);
-    swapNode(node,h.size()-1);
-    h.pop_back();
-    int i=node,j;
-    while (i < h.size()) {
-        j = 2*i;
-        if (j >= h.size()) {
-            break;
-        }
-        if (j+1 < h.size() && h[j].val > h[j+1].val || (h[j+1].val==h[j].val && h[j+1].ser<h[j].ser)) {
-            j++;
-        }
-        if (h[i].val>h[j].val || (h[i].val==h[j].val && h[i].ser>h[j].ser)) {
-            swap(h[i],h[j]);
-            swapNode(i,j);
-            i = j;
-        } else {
-            break;
-        }
-    }
-    return out;
-}
-
-Node heap::top(){
-    return h[1];
-}
-
-inline void printHeap() {
-    int a = 1 ,b = 0;
-    for (int i = 1; i < H.h.size(); i++) {
-        b++;
-        printf("%lld ", H.h[i].val);
-        if (a == b) {
-            ln;
-            a*=2;
-            b = 0;
-        }
-    }
+inline void debugNode(int node) {
+    if (!isDebug) return;
+    printf("node: %lld, key: %lld, h: %lld\n", node, g[node].key, g[node].h);
+    printf("left: %lld, right: %lld\n", g[node].l, g[node].r);
     ln;
 }
 
-void heap::adjust(int pos){
-    int i=pos,j;
-    while (i < h.size()) {
-        j = 2*i;
-        if (j >= h.size()) {
-            break;
-        }
-        if (j+1 < h.size() && cmp (h[j+1], h[j])) {
-            j++;
-        }
-        if (cmp(h[j], h[i])) {
-            swap(h[i],h[j]);
-            swapNode(i,j);
-            i = j;
-        } else {
-            break;
-        }
-    }
+inline void updateSize(int * node){
+    g[*node].size = g[g[*node].l].size + g[g[*node].r].size + 1;
 }
 
-inline void pop(int node){
-    if (g[node].p) {
-        g[g[node].p].n = g[node].n;
-    }
-    if (g[node].n) {
-        g[g[node].n].p = g[node].p;
-    }
-    H.popPos(g[node].pos);
+inline void updateHight(int * node) {
+    g[*node].h = max(g[g[*node].l].h, g[g[*node].r].h) + 1;
 }
 
-inline void join(int node){
-    int a=0,b=0;
-    if (g[node].p) {
-        a = (g[g[node].p].val ^ g[node].val) +1;
-    }
-    if (g[node].n) {
-        b = (g[g[node].n].val ^ g[node].val) +1;
-    }
-    if (a>=b) {
-        pop(g[node].p);
-        g[node].val = a;
+inline void update(int * node) {
+    updateHight(node);
+    updateSize(node);
+}
+
+//turns
+inline void LL(int * node) {
+    debug("doing LL, node", *node);
+    int tmp = g[*node].l;
+    g[*node].l = g[tmp].r;
+    g[tmp].r = *node;
+    *node =tmp;
+    update(&g[*node].l);
+    update(&g[*node].r);
+    update(node);
+}
+inline void RR(int * node) {
+    debug("doing RR, node", *node);
+    int tmp = g[*node].r;
+    g[*node].r = g[tmp].l;
+    g[tmp].l = *node;
+    *node = tmp;
+    update(&g[*node].l);
+    update(&g[*node].r);
+    update(node);
+}
+inline void LR(int * node) {
+    RR(&g[*node].l);
+    LL(node);
+}
+inline void RL(int * node) {
+    LL(&g[*node].r);
+    RR(node);
+}
+
+inline void restoreNode(int node) {
+    g[node].size = 0;
+    g[node].h = 0;
+    g[node].l = 0;
+    g[node].r = 0;
+    g[node].key = 0;
+    g[node].direction = 0;
+}
+
+inline void deleteNode(int * node, int tmp) {
+    if (!g[*node].r) {
+        restoreNode(*node);
+        freeNode.pb(*node);
+        g[tmp].key = g[*node].key;
+        *node =g[*node].l;
+
     } else {
-        pop(g[node].n);
-        g[node].val = b;
-
-    }        
-    H.adjust(1);
+        deleteNode(&g[*node].r, tmp);
+        if (g[g[*node].l].h - g[g[*node].r].h > 1) {
+            LL(node);
+        }
+    }
+    update(node);
 }
 
+inline bool insertBST(int * node, int val, int k) {
+    debug("now node", *node);
+    if (!*node) {
+        *node = ++cnt;
+        debug("inserting to node", *node);
+        g[*node].key = val;
+        g[*node].h = 1;
+        g[*node].size = 1;
+        return true;
+    }
+    bool flag;
+    if (k <= g[g[*node].l].size) {
+        g[*node].direction = -1;
+        debug("go left, k=", k);
+        flag = insertBST(&g[*node].l, val, k);
+        if (flag && g[g[*node].l].h - g[g[*node].r].h > 1) {
+            if (g[g[*node].l].direction == -1) {
+                LL(node);
+            } else {
+                LR(node);
+            }
+        }
+    } else if (k > g[g[*node].l].size) {
+        g[*node].direction = 1;
+        k -= g[g[*node].l].size + 1; //through left tree and root
+        debug("go right, k=", k);
+       flag = insertBST(&g[*node].r, val, k);
+        if (flag && g[g[*node].l].h - g[g[*node].r].h < -1) {
+            if (g[g[*node].r].direction == 1) {
+                RR(node);
+            } else {
+                RL(node);
+            }
+        }
+    }
+    if(flag) update(node);
+    return flag;
+}
 
+inline bool deleteBST(int * node, int k) {
+    if (!*node) {
+        return false;
+    }
+    bool flag = true;
+    //deleteNode
+    if (g[g[*node].l].size + 1 == k) {
+        if (!g[*node].l) {
+            *node = g[*node].r;
+        } else if (!g[*node].r) {
+            *node = g[*node].l;
+        } else {
+            deleteNode(&g[*node].l, *node);
+        }
+    } else if (k < g[g[*node].l].size + 1) {
+        flag = deleteBST(&g[*node].l, k);
+    } else {
+        k -= g[g[*node].l].size + 1;
+        flag = deleteBST(&g[*node].r, k);
+    }
+    //turning
+    if (flag && g[g[*node].l].h - g[g[*node].r].h < -1) {
+        if (g[g[*node].l].direction == 1) {
+            RR(node);
+        } else {
+            RL(node);
+        }
+    } else if (flag && g[g[*node].l].h - g[g[*node].r].h < -1) {
+        if (g[g[*node].r].direction == 1) {
+            RR(node);
+        } else {
+            RL(node);
+        }
+    }
+    //update height and size
+    if (flag) {
+        update(node);
+    }
+    return flag;
+}
 
+inline void inorderTranversal(int node) {
+    if (!node) return;
+    inorderTranversal(g[node].l);
+    Write(g[node].key);
+    putchar(' ');
+    inorderTranversal(g[node].r);
+}
+
+inline void bfs(int root) {
+    queue<int> tmp;
+    tmp.push(root);
+    int node;
+    while (!tmp.empty()) {
+        node = tmp.front();
+        Write(g[node].key);
+        putchar(' ');
+        tmp.pop();
+        if (g[node].l) {
+            tmp.push(g[node].l);
+        }
+        if (g[node].r) {
+            tmp.push(g[node].r);
+        }
+    }
+}
 
 inline void solution() {
-    n = read();
+    c = read(); n = read(); root = 1;
+    g[root].key = read(); cnt++;
+    for (int i = 2; i <= n; i++) {
+        insertBST(&root,read(),i);
+    }
+    ln;
     for (int i = 1; i <= n; i++) {
-        ++nodeCnt;
-        g[nodeCnt].val = read();
-        g[nodeCnt].ser = i;
-        g[nodeCnt].pos = i;
-        g[nodeCnt].p = i - 1;
-        g[nodeCnt].n = 0;
-
-        H.push(nodeCnt);
+        debugNode(i);
     }
-    for (int i = H.h.size() - 1; i > 0; i--) {
-        H.adjust(i);
-    }
-    while (H.h.size() > 2) {
-        join(H.top().pos);
-        printHeap();
+    deleteBST(&root, 10);
+    // deleteBST(&root, 10);
+    // deleteBST(&root, 10);
+    // deleteBST(&root, 10);
+    // deleteBST(&root, 10);
 
-
-    }
-    
-
-
-
+    inorderTranversal(root);
 
 }
+
 signed main() {
     solution();
     Please AC;

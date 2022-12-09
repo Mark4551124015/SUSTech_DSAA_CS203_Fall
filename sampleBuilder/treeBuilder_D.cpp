@@ -25,8 +25,6 @@ string filename = ".vscode/oi/in.txt";
 vector<pair<pii,int>> query;
 
 
-
-
 void creatData(int n) {
     srand(time(0));
 	fstream file(filename.c_str(), ios::out);
