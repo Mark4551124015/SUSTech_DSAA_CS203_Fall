@@ -84,7 +84,7 @@ inline pii cross(pii a, pii b) {
     return p;
 }
 
-inline pii sumRange(pii a, pii b) {
+inline pii sumR(pii a, pii b) {
     pii p = {a.x+b.x, a.y+b.y};
     if (p.x > p.y) {
         good = false;
@@ -101,7 +101,7 @@ inline pii getRange(int node) {
             }
             continue;
         }
-        tmp = sumRange(tmp, getRange(i));
+        tmp = sumR(tmp, getRange(i));
     }
     tmp.y = tmp.y+1;
     if (!checked[node]) {

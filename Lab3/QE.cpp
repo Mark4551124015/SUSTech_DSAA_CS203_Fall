@@ -8,7 +8,7 @@
 #define Please
 #define AC
 using namespace std;
-ll n, m, cntBlock = 0 , MaxNum = 0, range[maxData];
+ll n, m, cntBlock = 0 , MaxNum = 0, range[maxArray];
 // Fast I/O
 inline ll read() {
     ll x = 0, f = 1;
@@ -24,6 +24,7 @@ inline char readAlpha() {
 	}
 	return c;
 }
+
 inline void Write(ll x)
 {
     if(x<0)
@@ -34,10 +35,10 @@ inline void Write(ll x)
 }
 
 struct Node{
-	ll prev, next;
-	ll array[maxBlock*2+10],cntS[maxData/maxBlock+5],cnt[maxData],size;
+	ll left, right;
+	ll array[maxBlock*2+10],cntS[maxArray/maxBlock+5],cnt[maxArray],size;
 	void InsertBlock();
-}B[maxData/maxBlock],temp;
+}B[maxArray/maxBlock],temp;
 
 inline void InsertBlock(ll index) {
 	cntBlock++;
@@ -128,7 +129,7 @@ inline ll Query(ll l, ll r, ll k) {
 			temp.cntS[range[tmp]]++;
 			temp.cnt[tmp]++;
 		}
-		for (ll i = 1; i <= range[maxData - 1]; i++) {
+		for (ll i = 1; i <= range[maxArray - 1]; i++) {
 			if (temp.cntS[i] >= k) {
 				for (ll j = (i - 1) * maxBlock;;j++) {
 					if (k <= temp.cnt[j]) {
@@ -199,7 +200,7 @@ inline ll Query(ll l, ll r, ll k) {
 }
 
 inline void init() {
-    for(ll i=0;i<maxData;i++) {
+    for(ll i=0;i<maxArray;i++) {
 		range[i]=i/maxBlock+1;
 	}
 	cntBlock=range[n-1];

@@ -18,7 +18,7 @@ using namespace std;
 #define x first
 #define y second
 #define ln putchar('\n')
-#define isDebug true
+#define isDebug false
 #define debugLn if(isDebug)putchar('\n')
 
 //Fast RW
@@ -320,7 +320,7 @@ inline bool deleteBST(int * node, int k) {
     }
     bool flag = true;
     //deleteNode
-    if (k == g[g[*node].l].size) {
+    if (k == g[g[*node].l].size + 1) {
         if (!g[*node].l) {
             int tmp = *node;
             *node = g[*node].r;
@@ -335,7 +335,7 @@ inline bool deleteBST(int * node, int k) {
         } else {
             deleteNode(&g[*node].l, *node);
         }
-    } else if (k < g[g[*node].l].size) {
+    } else if (k < g[g[*node].l].size + 1) {
         debug("go left, k=", k);
         flag = deleteBST(&g[*node].l, k);
     } else {
@@ -414,39 +414,25 @@ inline void solution() {
     for (;m>0;m--) {
         scanf("%s", &op[0]);
         if (op == "ins") {
-            debug("---------------insert--------------");ln;
             // u = read(); v = read();
             scanf("%lld%lld",&u,&v);
             insertBST(&root, v, u);
             cnt++;
-            debug("---------------inserted--------------");ln;
         }
         else if (op == "rem") {
-            debug("---------------remove--------------");ln;
             // u = read();
             scanf("%lld",&u);
             deleteBST(&root, u);
             cnt--;
-            debug("---------------removed--------------");ln;
         }
         else if (op == "ask") {
             // u = read();
-            debug("---------------asking--------------");ln;
             scanf("%lld",&u);
             if (!cnt) {
                 Write(u);ln;
             } else {
                 Write(getDes(u, g[root].range, g[root].Offset));ln;
             }
-            debug("---------------asked--------------");ln;
-        }
-        else if (op == "nod") {
-            // u = read();
-            m++;
-            debug("---------------nodes--------------");ln;
-            debugInorderTranversal(root);
-            debug("---------------noded--------------");ln;
-
         }
     }
     debugInorderTranversal(root);
