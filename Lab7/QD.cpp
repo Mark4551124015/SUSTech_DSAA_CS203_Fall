@@ -12,14 +12,12 @@ using namespace std;
 #define AC 0
 #define pii pair<int, int>
 #define vi vector<int>
-#define N (int)200010
+#define N (int)200001
 #define all(x) (x).begin(), (x).end() 
 #define pb push_back
 #define x first
 #define y second
 #define ln putchar('\n')
-#define isDebug false
-#define debugLn if(isDebug)putchar('\n')
 
 //Fast RW
 inline ll read() {
@@ -54,20 +52,11 @@ inline void Write(ll x)
         Write(x/10);
     putchar(x%10+'0');
 }
-inline void debug(string a){
-    if (isDebug) printf("%s",a.c_str());
-}
-inline void debug(int a){
-    if (isDebug) printf("%lld ",a);
-}
-inline void debug(string a, int b){
-    if (isDebug) printf("%s: %lld\n",a.c_str(),b);
-}
 int n, c, tail, root, m, u, v, cnt;
 vi freeNode;
 pii road;
 struct node {
-    int l, r, direction; //-1 is left, 1 is right, 0 is none
+    int l, r; //-1 is left, 1 is right, 0 is none
     int size, key, h;
     int Offset;
     pii range;
@@ -75,14 +64,6 @@ struct node {
 inline void restoreNode(int node) {
     memcpy(&g[node], &none, sizeof(g[node]));
 }
-inline void debugNode(int node) {
-    if (!isDebug) return;
-    printf("node: %lld, key: %lld, h: %lld, size: %lld\n", node, g[node].key, g[node].h, g[node].size);
-    printf("left: %lld, right: %lld\n", g[node].l, g[node].r);
-    printf("range: %lld %lld, offset: %lld\n", g[node].range.x, g[node].range.y, g[node].Offset);
-    debugLn;
-}
-
 inline bool inRange(int x, pii range) {
     return (x <= range.y && x >= range.x);
 }
@@ -116,12 +97,9 @@ inline pii cross(pii a, pii b) {
     pii p = {max(a.x,b.x), min(a.y,b.y)};
     return validRange(p);
 }
-
-
 inline int getDes(int x, pii range, int offSet) {
     int out;
     if (inRange(x,range)) {
-        debug(x);
         out = x+offSet;
     }
     if (x < range.x) {
@@ -132,29 +110,19 @@ inline int getDes(int x, pii range, int offSet) {
     }
     return validInt(out);
 } 
-
 inline pii sumRange(pii a, pii b, int offSet) {
     pii out;
     out.x = getDes(a.x, b, offSet);
     out.y = getDes(a.y, b, offSet);
     return out;
 }
-
-
-
-
 inline void originRange(int node) {
     g[node].range = {sumR(road, {g[node].key, g[node].key})};
     g[node].Offset = g[node].key;
     g[node].range = sumR(g[node].range, {-g[node].key, -g[node].key});
 }
-//waiting to debug
 inline void updateRange(int node) {
-    // return;
-
     originRange(node);
-    // return;
-
     int left = g[node].l; int right = g[node].r; 
     pii tmp;
     if (left) {
@@ -192,7 +160,6 @@ inline void updateRange(int node) {
     }
 }
 
-
 inline void updateSize(int node){
     g[node].size = g[g[node].l].size + g[g[node].r].size + 1;
 }
@@ -222,7 +189,6 @@ inline int newNode(int val) {
 
 //turns
 inline void LL(int * node) {
-    debug("doing LL, node", *node);
     int tmp = g[*node].l;
     g[*node].l = g[tmp].r;
     g[tmp].r = *node;
@@ -232,7 +198,6 @@ inline void LL(int * node) {
     update(*node);
 }
 inline void RR(int * node) {
-    debug("doing RR, node", *node);
     int tmp = g[*node].r;
     g[*node].r = g[tmp].l;
     g[tmp].l = *node;
@@ -250,9 +215,14 @@ inline void RL(int * node) {
     RR(node);
 }
 
+inline bool doLL(int node) {
+    return g[g[node].l].l;
+}
+inline bool doRR(int node) {
+    return g[g[node].r].r;
+}
+
 inline bool insertBST(int * node, int val, int k) {
-    debug("insert BST now node ", *node);
-    debug("value", val);
     if (!g[root].h) {
         root = 1;
         restoreNode(1);
@@ -266,28 +236,25 @@ inline bool insertBST(int * node, int val, int k) {
     }
     if (!*node) {
         *node = newNode(val);
-         // debug("inserting to node", *node);
         return true;
     }
     bool flag;
     if (k <= g[g[*node].l].size + 1) {
-        g[*node].direction = -1;
-        debug("go left, k=", k);
+
         flag = insertBST(&g[*node].l, val, k);
         if (flag && g[g[*node].l].h - g[g[*node].r].h > 1) {
-            if (g[g[*node].l].direction == -1) {
+            if (doLL(*node)) {
                 LL(node);
             } else {
                 LR(node);
             }
         }
     } else if (k > g[g[*node].l].size) {
-        g[*node].direction = 1;
+
         k -= g[g[*node].l].size + 1; //through left tree and root
-        debug("go right, k=", k);
        flag = insertBST(&g[*node].r, val, k);
         if (flag && g[g[*node].l].h - g[g[*node].r].h < -1) {
-            if (g[g[*node].r].direction == 1) {
+            if (doRR(*node)) {
                 RR(node);
             } else {
                 RL(node);
@@ -298,12 +265,11 @@ inline bool insertBST(int * node, int val, int k) {
     return flag;
 }
 
-inline void deleteNode(int * node, int tmp) {
+inline void deleteNode(int * node, int *tmp) {
     if (!g[*node].r) {
-        debug("deleting node", *node);
-        g[tmp].key = g[*node].key;
+        g[*tmp].key = g[*node].key;
         int temp = *node;
-        *node =g[*node].l;
+        *node = g[*node].l;
         restoreNode(temp);
         freeNode.pb(temp);
     } else {
@@ -313,6 +279,7 @@ inline void deleteNode(int * node, int tmp) {
         }
     }
     update(*node);
+
 }
 inline bool deleteBST(int * node, int k) {
     if (!*node) {
@@ -320,7 +287,7 @@ inline bool deleteBST(int * node, int k) {
     }
     bool flag = true;
     //deleteNode
-    if (k == g[g[*node].l].size + 1) {
+    if (k == g[g[*node].l].size +1) {
         if (!g[*node].l) {
             int tmp = *node;
             *node = g[*node].r;
@@ -331,47 +298,47 @@ inline bool deleteBST(int * node, int k) {
             *node = g[*node].l;
             restoreNode(tmp);
             freeNode.pb(tmp);
-
         } else {
-            deleteNode(&g[*node].l, *node);
+            deleteNode(&g[*node].l,node);
         }
     } else if (k < g[g[*node].l].size + 1) {
-        debug("go left, k=", k);
         flag = deleteBST(&g[*node].l, k);
+        if (flag && g[g[*node].l].h - g[g[*node].r].h > 1) {
+            if ( doLL(*node)) {
+                LL(node);
+            } else {
+                LR(node);
+            }
+        } else if (flag && g[g[*node].l].h - g[g[*node].r].h < -1) {
+            if ( doRR(*node)) {
+                RR(node);
+            } else {
+                RL(node);
+            }
+        }
+    
     } else {
         k -= g[g[*node].l].size + 1;
-        debug("go right, k=", k);
         flag = deleteBST(&g[*node].r, k);
-    }
-    //turning
-    if (flag && g[g[*node].l].h - g[g[*node].r].h < -1) {
-        if (g[g[*node].l].direction == 1) {
-            RR(node);
-        } else {
-            RL(node);
+        if (flag && g[g[*node].l].h - g[g[*node].r].h > 1) {
+            if ( doLL(*node)) {
+                LL(node);
+            } else {
+                LR(node);
+            }
+        } else if (flag && g[g[*node].l].h - g[g[*node].r].h < -1) {
+            if (doRR(*node)) {
+                RR(node);
+            } else {
+                RL(node);
+            }
         }
-    } else if (flag && g[g[*node].l].h - g[g[*node].r].h < -1) {
-        if (g[g[*node].r].direction == 1) {
-            RR(node);
-        } else {
-            RL(node);
-        }
+        
     }
-    //update height and size
     if (flag) {
         update(*node);
     }
     return flag;
-}
-
-inline void debugInorderTranversal(int node) {
-    if (!isDebug) return;
-    if (!node) return;
-    debugInorderTranversal(g[node].l);
-    Write(g[node].key);
-    putchar(' ');
-    debugNode(node);
-    debugInorderTranversal(g[node].r);
 }
 
 inline void inorderTranversal(int node) {
@@ -379,7 +346,6 @@ inline void inorderTranversal(int node) {
     inorderTranversal(g[node].l);
     Write(g[node].key);
     putchar(' ');
-    debugNode(node);
     inorderTranversal(g[node].r);
 }
 
@@ -401,41 +367,37 @@ inline void bfs(int root) {
     }
 }
 inline void solution() {
-     root = 1;
-    scanf("%lld%lld",&c,&n);
-    // c = read(); n = read();
+    root = 1;
+    c = read(); n = read();
     road = {0,c}; cnt = n;
     for (int i = 1; i <= n; i++) {
-        scanf("%lld",&u);insertBST(&root,u,i);
-        // insertBST(&root,read(),i);
+        insertBST(&root,read(),i);
     }
     m = read();
     string op; op.resize(3);
     for (;m>0;m--) {
         scanf("%s", &op[0]);
         if (op == "ins") {
-            // u = read(); v = read();
-            scanf("%lld%lld",&u,&v);
+            u = read(); v = read();
             insertBST(&root, v, u);
             cnt++;
         }
         else if (op == "rem") {
-            // u = read();
-            scanf("%lld",&u);
+            u = read();
             deleteBST(&root, u);
+
             cnt--;
         }
         else if (op == "ask") {
-            // u = read();
-            scanf("%lld",&u);
+            u = read();
             if (!cnt) {
                 Write(u);ln;
             } else {
                 Write(getDes(u, g[root].range, g[root].Offset));ln;
             }
         }
+
     }
-    debugInorderTranversal(root);
 
 }   
 signed main() {
