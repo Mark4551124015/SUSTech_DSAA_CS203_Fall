@@ -17,8 +17,6 @@ using namespace std;
 #define pb push_back
 #define x first
 #define y second
-#define isDebug false
-#define ln if(isDebug)putchar('\n');
 
 //Fast RW
 inline ll read() {
@@ -52,15 +50,6 @@ inline void Write(ll x)
     if(x>9)
         Write(x/10);
     putchar(x%10+'0');
-}
-inline void debug(string a){
-    if (isDebug) printf("%s",a.c_str());
-}
-inline void debug(int a){
-    if (isDebug) printf("%lld ",a);
-}
-inline void debug(string a, int b){
-    if (isDebug) printf("%s: %lld\n",a.c_str(),b);
 }
 
 int T,n,tmp,nodeCnt;
@@ -108,22 +97,7 @@ inline void heap::popPos(int pos){
 inline int heap::top(){
     return h[1];
 }
-inline void printHeap() {
-    if (!isDebug) {
-        return;
-    }
-    int a = 1 ,b = 0;
-    for (int i = 1; i < H.h.size(); i++) {
-        b++;
-        debug(g[H.h[i]].val);
-        if (a == b) {
-            debug("\n");
-            a*=2;
-            b = 0;
-        }
-    }
-    ln;
-}
+
 inline void heap::adjust(int pos){
     int i=pos,j;
     while (i < h.size()) {
@@ -176,11 +150,7 @@ inline void join(int node){
         pop(g[node].n);
         g[node].val = b;
     }
-    printHeap();
-    debug("result", g[node].val);
     H.adjust(1);
-    printHeap();
-    ln;
 }
 inline void solution() {
     n = read();
@@ -200,7 +170,6 @@ inline void solution() {
     for (int i = H.h.size() - 1; i > 0; i--) {
         H.adjust(i);
     }
-
     while (H.h.size() > 2) {
         join(H.top());
     }

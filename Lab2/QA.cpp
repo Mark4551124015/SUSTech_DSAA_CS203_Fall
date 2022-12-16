@@ -2,7 +2,7 @@
 #define ll long long
 #pragma G++ optimize(2)
 ll n, arr[100005], tempArr[100005]; 
-ll sum = 0;
+ll sumAll = 0;
 //Fast RW
 inline ll read() {
     ll x = 0, f = 1;
@@ -102,8 +102,8 @@ int main(){
     }   
     mergeSort(arr, tempArr, 0, n-1);
     for (ll i = 0; i < n/2; i++) {
-        sum += arr[i]*arr[n-1-i];
+        sumAll += arr[i]*arr[n-1-i];
     }
     // IntegerWrite(sum);
-    Write(sum);
+    Write(sumAll);
 }

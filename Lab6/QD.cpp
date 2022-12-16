@@ -50,7 +50,7 @@ inline void Write(ll x)
     putchar(x%10+'0');
 }
 int n,u,v,p;
-int root,sum;
+int root,sumAll;
 struct Node{
     vector<int> con;
     int data;
@@ -85,13 +85,13 @@ inline void specialCondition(){
     if (g[secMax].data) {
         g[secMax].data = g[root].data;
     } else {
-        sum += g[root].data;
+        sumAll += g[root].data;
     }
 }
 
 inline void dfsOp(int node, int lastNode) {
     if (g[node].con.size()==1 && node != root) {
-        sum+=g[node].data;
+        sumAll+=g[node].data;
         return;
     }
     g[g[node].maxSon].data = g[node].data;
@@ -122,7 +122,7 @@ inline void solution() {
     dfsMax(root,0);
     specialCondition();
     dfsOp(root,0);
-    Write(sum);
+    Write(sumAll);
 }
 signed main() {
     solution();
