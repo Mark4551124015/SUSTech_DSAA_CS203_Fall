@@ -43,73 +43,22 @@ inline void debug(string a, int b){
     if (isDebug) printf("%s: %lld\n",a.c_str(),b);
 }
 
-int n, sum, k, sumA, sumB, sumC;
-int arr[N], postFix[N];
+int n, m;
+int con[N][N];
+struct node{
+    bool isSure;
+    int dist = 0x3f;
+}g[N];
 
-inline bool checkFirst() {
-    return (!(postFix[1]&1));
-}
-
-inline bool checkSecond() {
-    k = n; sum = 0;
-    for (int i = 1; i <= n; i++) {
-        sum += arr[i];
-        for (;k > i && arr[k] < i-1; k--); 
-        if (k < i) k = i;
-        sumA = i*(i-1);
-        sumB = i*(k-i);
-        sumC = postFix[k+1];
-        if (k >= n) sumC = 0;
-        if (sumA + sumB + sumC < sum) return false;
-    }
-    return true;
-}
-
-inline bool checkThird() {
-    return postFix[1] == (n-1)*2;
-}
-
-inline bool checkFourth() {
-    if (n == 1) return true; 
-    for (int i = 1; i<=n; i++) {
-        if (arr[i] <= 0) return false;
-    }
-    return true;
-}
-
-inline void check() {
-    bool A = checkFirst();
-    bool B = checkSecond();
-    bool C = checkThird();
-    bool D = checkFourth();
-    // debug(C);
-    if (A) printf("YES");
-    else printf("NO");
-    ln;
-    if (A&&B) printf("YES");
-    else printf("NO");       
-    ln;
-    if (A&&B&&C&&D) printf("YES");
-    else printf("NO");    
-    ln;
-}
-
-inline bool cmp(int a, int b) {
-    return a>b;
-}
 inline void solution() {
-    n = read();
-    // scanf("%lld",&n);
+    while () {
+        
+    }
+    g[1].isSure = true;
+    g[1].dist = 0;
     for (int i = 1; i <= n; i++) {
-        arr[i] = read(); 
-        // scanf("%lld", &arr[i]);    
+
     }
-    sort(arr+1, arr+n+1, cmp);
-    postFix[n] = arr[n];
-    for (int i = n - 1; i > 0 ; i--) {
-        postFix[i] = arr[i] + postFix[i+1];
-    }
-    check();
 }
 
 signed main() {
