@@ -9,7 +9,7 @@
 using namespace std;
 #define Please return
 #define AC 0
-#define N 50005
+#define N 50000
 #define all(x) (x).begin(), (x).end() 
 #define pii pair<int, int>
 #define vi vector<int>
