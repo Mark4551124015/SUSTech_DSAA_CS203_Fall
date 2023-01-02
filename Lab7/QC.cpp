@@ -65,7 +65,6 @@ struct heap{
     int top();
     void adjust(int pos);
     void adjustUp(int pos);
-
 }H;
 
 inline void swapNode(int a, int b) {
@@ -97,7 +96,6 @@ inline void heap::popPos(int pos){
 inline int heap::top(){
     return h[1];
 }
-
 inline void heap::adjust(int pos){
     int i=pos,j;
     while (i < h.size()) {
