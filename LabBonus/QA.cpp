@@ -38,24 +38,47 @@ inline void Write(int x)
     putchar(x%10+'0');
 }
 
-int n, t, num;
+int L, n, m;
+vi place;
+inline void init() {
+    place.clear();
+    place.pb(0);
+    for (; n > 0; n--) place.pb(read());
+    sort(all(place));
+}
 
-
-inline void getDiff() {
-    n = read();
-    int maxNum = MIN_INT;
-    int ans = MIN_INT;
-    for (int i = 0; i < n; i++) {
-        num = read();
-        if (i!=0) ans = max(maxNum - num, ans);
-        maxNum = max(num,maxNum);
+inline bool check(int ans) {
+    int i = 0, player = m;
+    int canReach, curP, cant;
+    while (true) {
+        curP = place[i];
+        canReach = curP + ans; player--;
+        if (player < 0) return false;
+        if (canReach > L) return true;
+        cant = true;
+        while (i < place.size() - 1) {
+            if (canReach >= place[i+1]) {
+                cant = false; i++;
+            } else {
+                break;
+            }
+        }
+        if (cant) return false;
     }
-    Write(ans);sp;
+
+}
+
+inline void getAns() {
+
 }
 
 inline void solution() {
-    t = read();
-    for (; t>0; t--) getDiff();
+    while (true) {
+        L = read(); n = read(); m = read();
+        init();
+    }
+    
+
 }
 
 signed main() {
