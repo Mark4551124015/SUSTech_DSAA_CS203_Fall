@@ -9,8 +9,7 @@
 using namespace std;
 #define Please return
 #define AC 0
-#define N 200005
-#define size 26
+#define N 1005
 #define all(x) (x).begin(), (x).end() 
 #define pii pair<int, int>
 #define vi vector<int>
@@ -28,18 +27,10 @@ inline int read(){
     while (c >= '0' && c <= '9') x = x * 10 + c - '0', c = getchar();
     return x * f;
 }
-inline int readStr(char str[]) {
-    char c;
-    c= getchar();
-    ll i = 0;
-	while (!isalpha(c)) {
-	    c = getchar();
-	}
-    while (isalpha(c)) {
-        str[i++] = c;
-        c = getchar();
-    }
-    return i;
+inline char readC(){
+    char c = getchar();
+    while (!(c == '('||c == '['||c == '{' || c == ')'||c == ']'||c == '}')) c = getchar();
+    return c;
 }
 
 inline void Write(int x)
@@ -51,36 +42,40 @@ inline void Write(int x)
     putchar(x%10+'0');
 }
 
-int T;
-int len, x;
-int nextArr[N];
-char str[N];
-
-inline int getID(char c) {
-    return c-97;
-}
-
-inline int KMP () {
-    int k = -1, j = 0;
-    nextArr[0] = -1;
-    while (j < len) {
-        if (k==-1 || str[j] == str[k]) {
-            ++j;++k;nextArr[j]=k;
+int T, n;
+char c;
+inline bool check() {
+    stack<char> b;
+    n = read();
+    for (int i = 0; i < n; i++) {
+        c = readC();
+        if (c == '('||c == '['||c == '{') {
+            b.push(c);
         } else {
-            k = nextArr[k];
+            if (b.empty()) return false;
+            if (c == ')') {
+                if (b.top() == '(') b.pop();
+                else return false;
+            }
+            if (c == ']') {
+                if (b.top() == '[') b.pop();
+                else return false;
+            }
+            if (c == '}') {
+                if (b.top() == '{') b.pop();
+                else return false;
+            }
         }
     }
-    return nextArr[len];
+    if (b.empty()) return true;
+    return false;
 }
 
 inline void solution() {
     T = read();
     for (; T > 0; T--) {
-        len = readStr(str);
-        int same = KMP();
-        // printf("semi: %lld\n", same);
-        if (same >= len/2) Write(0);
-        else Write(len - same*2);
+        if (check()) printf("YES");
+        else printf("NO");
         ln;
     }
     

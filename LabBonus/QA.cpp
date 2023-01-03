@@ -19,8 +19,8 @@ using namespace std;
 #define ln putchar('\n')
 #define sp putchar(' ')
 #define MIN_INT -2147483648
-
-
+ 
+ 
 //Fast RW
 inline int read(){
     int x = 0, f = 1;
@@ -37,52 +37,28 @@ inline void Write(int x)
         Write(x/10);
     putchar(x%10+'0');
 }
-
-int L, n, m;
-vi place;
-inline void init() {
-    place.clear();
-    place.pb(0);
-    for (; n > 0; n--) place.pb(read());
-    sort(all(place));
-}
-
-inline bool check(int ans) {
-    int i = 0, player = m;
-    int canReach, curP, cant;
-    while (true) {
-        curP = place[i];
-        canReach = curP + ans; player--;
-        if (player < 0) return false;
-        if (canReach > L) return true;
-        cant = true;
-        while (i < place.size() - 1) {
-            if (canReach >= place[i+1]) {
-                cant = false; i++;
-            } else {
-                break;
-            }
-        }
-        if (cant) return false;
+ 
+int n, t, num;
+ 
+ 
+inline void getDiff() {
+    n = read();
+    int maxNum = MIN_INT;
+    int ans = MIN_INT;
+    for (int i = 0; i < n; i++) {
+        num = read();
+        if (i!=0) ans = max(maxNum - num, ans);
+        maxNum = max(num,maxNum);
     }
-
+    Write(ans);sp;
 }
-
-inline void getAns() {
-
-}
-
+ 
 inline void solution() {
-    while (true) {
-        L = read(); n = read(); m = read();
-        init();
-    }
-    
-
+    t = read();
+    for (; t>0; t--) getDiff();
 }
-
+ 
 signed main() {
     solution();
     Please AC;
 }
-
