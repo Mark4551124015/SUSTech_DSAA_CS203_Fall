@@ -48,7 +48,6 @@ struct node{
     vector<pii> con;        //x is node, y is cost
 }g[N];
 
-
 struct heap{
     vector<int> h;
     void push(int node);
@@ -59,16 +58,13 @@ struct heap{
     bool isEmpty();
     void swapNode(int a, int b);
 }H;
-
 inline void heap::swapNode(int a, int b){
     swap(g[h[a]].pos, g[h[b]].pos);
     swap(h[a],h[b]);
 }
-
 inline bool cmp(int a, int b) {
     return (g[a].data < g[b].data);
 }
-
 inline void heap::push(int node){
     if (h.empty()) {
         h.pb(0);
